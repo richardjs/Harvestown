@@ -39,6 +39,11 @@ class Controller{
 		document.addEventListener('mouseout', e => {
 			this.mouseOut = true
 		})
+		document.addEventListener('mouseover', e => {
+			if(e.buttons < 2){
+				this.draggingView = false
+			}
+		})
 		document.addEventListener('contextmenu', e => {
 			e.preventDefault()
 		})
