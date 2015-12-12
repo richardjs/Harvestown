@@ -13,6 +13,9 @@ exports.VILLAGER_SPEED = 20
 exports.VILLAGER_WANDER_RANGE = 10
 exports.VILLAGER_HUNGER_TIME = 60*1000
 
+//Farm parameters
+exports.FARM_GROWTH_TIME = 10*1000
+
 // House parameters
 exports.HOUSE_STARTING_FOOD = 3
 exports.HOUSE_MAX_FOOD = 5

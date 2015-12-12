@@ -1,5 +1,6 @@
 'use strict'
 
+var C = require('./constants.js')
 var I = require('./image.js')
 
 class Farm{
@@ -9,6 +10,8 @@ class Farm{
 		this.image = I.FARM_UNPLANTED
 		this.state = 'unplanted'
 		this.activeVillager = null
+		
+		this.growthTimer = 0
 	}
 
 	get tile(){
@@ -17,12 +20,31 @@ class Farm{
 	
 	plant(){
 		this.state = 'planted'
+		this.growthTimer = C.FARM_GROWTH_TIME
 		this.image = I.FARM_BARE
 		this.activeVillager = null
 	}
 
 	update(delta){
+		if(this.state !== 'planted'){
+			return
+		}
 
+		if(this.growthTimer > 0){
+			this.growthTimer -= delta
+			if(this.growthTimer <= 0){
+				this.state = 'matured'
+				this.image = I.FARM_MATURED
+				return
+			}
+		}
+
+		if(this.growthTimer < C.FARM_GROWTH_TIME*.66){
+			this.image = I.FARM_SPROUTS
+		}
+		if(this.growthTimer < C.FARM_GROWTH_TIME*.33){
+			this.image = I.FARM_GROWING
+		}
 	}
 }
 

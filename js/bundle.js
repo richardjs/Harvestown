@@ -136,6 +136,9 @@
 	exports.VILLAGER_WANDER_RANGE = 10;
 	exports.VILLAGER_HUNGER_TIME = 60 * 1000;
 
+	//Farm parameters
+	exports.FARM_GROWTH_TIME = 10 * 1000;
+
 	// House parameters
 	exports.HOUSE_STARTING_FOOD = 3;
 	exports.HOUSE_MAX_FOOD = 5;
@@ -385,6 +388,12 @@
 	exports.FARM_UNPLANTED.src = __webpack_require__(12);
 	exports.FARM_BARE = new Image();
 	exports.FARM_BARE.src = __webpack_require__(10);
+	exports.FARM_SPROUTS = new Image();
+	exports.FARM_SPROUTS.src = __webpack_require__(15);
+	exports.FARM_GROWING = new Image();
+	exports.FARM_GROWING.src = __webpack_require__(13);
+	exports.FARM_MATURED = new Image();
+	exports.FARM_MATURED.src = __webpack_require__(14);
 
 /***/ },
 /* 5 */
@@ -952,6 +961,7 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	var C = __webpack_require__(1);
 	var I = __webpack_require__(4);
 
 	var Farm = (function () {
@@ -963,18 +973,41 @@
 			this.image = I.FARM_UNPLANTED;
 			this.state = 'unplanted';
 			this.activeVillager = null;
+
+			this.growthTimer = 0;
 		}
 
 		_createClass(Farm, [{
 			key: 'plant',
 			value: function plant() {
 				this.state = 'planted';
+				this.growthTimer = C.FARM_GROWTH_TIME;
 				this.image = I.FARM_BARE;
 				this.activeVillager = null;
 			}
 		}, {
 			key: 'update',
-			value: function update(delta) {}
+			value: function update(delta) {
+				if (this.state !== 'planted') {
+					return;
+				}
+
+				if (this.growthTimer > 0) {
+					this.growthTimer -= delta;
+					if (this.growthTimer <= 0) {
+						this.state = 'matured';
+						this.image = I.FARM_MATURED;
+						return;
+					}
+				}
+
+				if (this.growthTimer < C.FARM_GROWTH_TIME * .66) {
+					this.image = I.FARM_SPROUTS;
+				}
+				if (this.growthTimer < C.FARM_GROWTH_TIME * .33) {
+					this.image = I.FARM_GROWING;
+				}
+			}
 		}, {
 			key: 'tile',
 			get: function get() {
@@ -992,6 +1025,24 @@
 /***/ function(module, exports) {
 
 	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAEUwAABFMBAq/upQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAAiSURBVDiNYzxbbfefgYqAiZqGjRo4auCogaMGjho4lAwEAHD/Aq3b5gigAAAAAElFTkSuQmCC"
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAEUwAABFMBAq/upQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAG+SURBVDiNzdW9axRBGIDxZ97dTcKKCXfGJidyioGLiV0KEyGSFBaKjUE77a39U7RPYyVoYxFEgiASsbIxUaIYC48U4fKBycW93Z2xmD0nu6dEwha+5bsPzM7+OE6dG8Q0KoqxU7D1U2hFwofNmEZF0ajCdpTfXRyG1kF+N1aFViS0Ig8BGLhnWJg3HNzWdGdt0vDohuH9JfN7d/aBYeGW4cT9NNc9PNSJePCqH7ZjWAwMSgEKvjUg9mFl1B7iB/DkB2zF8HgXRPLdataJTmEKCD2YRWEMYKD2FTwNo+sCQBLDzSHbzQ8ptM53F7JOlIKPPrQTWOlz19usQarg+0h2ssBy23Zvo96u2e2wbw4KlOvsKHrniJ0YA+Mde5WJjntyummvcmbDXkVrmA5tNzVAT1fLOhEP3gi0U1hSDqV5HlKBz3WH8nzXdk93HEq3+1I/hHJF25PndEkoq0GG0l8SynEB/o4S/+8oMwlUAriWlIAC8HIPdjrwYr9ElOKP5LgjADMhhD5cDQso5g8oPlwuopgCyrs++7FfB/+G8uwolNnIolzvOJT6JwgSGF9zKHdOQjWAu4MOpdipsv8CfgENKz16vrFaZgAAAABJRU5ErkJggg=="
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAEUwAABFMBAq/upQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAGxSURBVDiNzdVBTxNBGIDhd76WEpXdhFQO1FDTYkKtiQleBeUkJuofMuHfqDe9mcDNoEcCB0mFGIgIamJbD11CaaHzefgWtiWVi3tgLpOdvJnszLPJulKIVsYd1ZvQbAvNjrBZP6Ey7ribhz/Hg2v3JqBxNLhWzUPjWGh2MlAK0c1XqF9Da6+dvpge0VKIvnmJtj6i75bkfO33CqprNl/s3i6JPp/OqWSzUJ0BB1RmFBEQgWdPIbgGTxY9zkEuBxN5AJszmcFuMe7k9BR2f1i4t+/wHryHD6vQOYFPq4IqdLvQiqxrRY5eb3gnIlCctLBQUACcgwezMDoC1fsesDcKxqwLxv7dCdhxAZzy30O8h4MDe/j107ZWhY0NO8qXzwJArwfRoXWH8dzf1eJOslm4XbRgqpigPH5kR3k4n6CEQXzkIEE56+bm+1C+7Vv4fS8llKlCjHIrJZQ0h6HE3+HVRfm6a+HOTgoozsH1+LJHb1xFFFVox5fcPUpQ1i9BifpQ1oeh3ClbUC4nKAuXoIR9KAvDUGrboMDWVoLyfhmiNqwsJyj1pm1YbyQoFzuX9i/gL/U8W2YTZ1aRAAAAAElFTkSuQmCC"
+
+/***/ },
+/* 15 */
+/***/ function(module, exports) {
+
+	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAEUwAABFMBAq/upQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABySURBVDiNY1TkY/ivIcjIoCHEwPD+JxPD259MDFde/2YgRUxTiIHh7U8mhrc/mRmYGKgM4AbuMvyPIUms2E4kMbiBbucZMRQSK+aOJAY38K4khjqyxGgXhsrPMSXJERuNFMrBaKSggtFIwSlGn0ihFgAAEWJinCaBnjMAAAAASUVORK5CYII="
 
 /***/ }
 /******/ ]);
