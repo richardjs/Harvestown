@@ -5,7 +5,8 @@ module.exports = {
 	},
 	module: {
 		loaders: [
-			{test: /\.js$/, loader: 'babel-loader'}
+			{test: /\.js$/, loader: 'babel-loader'},
+			{test: /\.(png)$/, loader: 'url-loader'}
 		]
 	}
 };

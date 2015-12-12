@@ -1,5 +1,7 @@
 'use strict'
 
+var Villager = require('./villager.js')
+
 var WATER_CELL_RANDOM_START_CHANCE = .47
 var WATER_GENERATIONS = 50
 var TREE_CELL_RANDOM_START_CHANCE = .43
@@ -14,8 +16,14 @@ class Map{
 		for(var i = 0; i < width; i++){
 			this.data.push([])
 		}
+		this.generateGeography()
 
-		var map = new ROT.Map.Cellular(width, height)
+		this.entities = []
+		this.entities.push(new Villager({x: 50, y: 50}))
+	}
+
+	generateGeography(){
+		var map = new ROT.Map.Cellular(this.width, this.height)
 		map.randomize(TREE_CELL_RANDOM_START_CHANCE)
 		for(var i = 0; i < TREE_GENERATIONS; i++){
 			map.create()
@@ -26,7 +34,7 @@ class Map{
 			}
 		})
 
-		map = new ROT.Map.Cellular(width, height)
+		map = new ROT.Map.Cellular(this.width, this.height)
 		map.randomize(WATER_CELL_RANDOM_START_CHANCE)
 		for(var i = 0; i < WATER_GENERATIONS; i++){
 			map.create()

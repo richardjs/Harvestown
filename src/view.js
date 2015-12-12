@@ -3,6 +3,9 @@
 var TILE_WIDTH = 20
 var TILE_HEIGHT = 20
 
+var VILLAGER_IMAGE = document.createElement('img')
+VILLAGER_IMAGE.src = require('../img/villager.png')
+
 class View{
 	constructor(canvas, ctx, map){
 		this.canvas = canvas
@@ -27,11 +30,24 @@ class View{
 	}
 
 	render(){
+		this.renderTiles()
+		for(var entity of this.map.entities){
+			this.ctx.drawImage(
+				VILLAGER_IMAGE,
+				entity.pos.x - this.offset.x,
+				entity.pos.y - this.offset.y,
+				20,
+				20/VILLAGER_IMAGE.width * VILLAGER_IMAGE.height
+			)
+		}
+	}
+
+	renderTiles(){
 		var tileOffset = {
 			x: Math.floor(this.offset.x / TILE_WIDTH),
 			y: Math.floor(this.offset.y / TILE_HEIGHT)
 		}
-		var pixelOffset = {
+		var subTileOffset = {
 			x: this.offset.x % TILE_WIDTH,
 			y: this.offset.y % TILE_HEIGHT
 		}
@@ -42,15 +58,15 @@ class View{
 				}
 				switch(this.map.data[x+tileOffset.x][y+tileOffset.y]){
 					case 'water':
-						this.ctx.fillStyle = 'blue'
+						this.ctx.fillStyle = '#008'
 						break
 					case 'tree':
 						this.ctx.fillStyle = '#840'
 						break
 					default:
-						this.ctx.fillStyle = 'green'
+						this.ctx.fillStyle = '#171'
 				}
-				this.ctx.fillRect(x*TILE_WIDTH - pixelOffset.x, y*TILE_HEIGHT - pixelOffset.y, TILE_WIDTH, TILE_HEIGHT);
+				this.ctx.fillRect(x*TILE_WIDTH - subTileOffset.x, y*TILE_HEIGHT - subTileOffset.y, TILE_WIDTH, TILE_HEIGHT);
 			}
 		}
 
