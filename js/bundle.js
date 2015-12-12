@@ -52,6 +52,8 @@
 	var TILE_WIDTH = 20;
 	var TILE_HEIGHT = 20;
 
+	var MAX_FRAME_DELTA = 100;
+
 	var Map = __webpack_require__(1);
 	var View = __webpack_require__(3);
 	var Controller = __webpack_require__(5);
@@ -83,27 +85,33 @@
 		var delta = time - lastTime;
 		lastTime = time;
 
-		var _iteratorNormalCompletion = true;
-		var _didIteratorError = false;
-		var _iteratorError = undefined;
+		delta *= controller.gameSpeed;
 
-		try {
-			for (var _iterator = map.entities[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-				var entity = _step.value;
+		while (delta > 0) {
+			var frameDelta = Math.min(delta, MAX_FRAME_DELTA);
+			delta -= frameDelta;
+			var _iteratorNormalCompletion = true;
+			var _didIteratorError = false;
+			var _iteratorError = undefined;
 
-				entity.update(delta);
-			}
-		} catch (err) {
-			_didIteratorError = true;
-			_iteratorError = err;
-		} finally {
 			try {
-				if (!_iteratorNormalCompletion && _iterator.return) {
-					_iterator.return();
+				for (var _iterator = map.entities[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+					var entity = _step.value;
+
+					entity.update(frameDelta);
 				}
+			} catch (err) {
+				_didIteratorError = true;
+				_iteratorError = err;
 			} finally {
-				if (_didIteratorError) {
-					throw _iteratorError;
+				try {
+					if (!_iteratorNormalCompletion && _iterator.return) {
+						_iterator.return();
+					}
+				} finally {
+					if (_didIteratorError) {
+						throw _iteratorError;
+					}
 				}
 			}
 		}
@@ -443,6 +451,7 @@
 		this.mousePos = { x: 0, y: 0 };
 		this.draggingView = false;
 		this.mouseOut = false;
+		this.gameSpeed = 1;
 
 		document.addEventListener('mousedown', function (e) {
 			switch (e.button) {
@@ -484,6 +493,24 @@
 		});
 		document.addEventListener('contextmenu', function (e) {
 			e.preventDefault();
+		});
+
+		document.addEventListener('keydown', function (e) {
+			//console.log(e.keyCode)
+			switch (e.keyCode) {
+				case 49:
+					_this.gameSpeed = 1;
+					break;
+				case 50:
+					_this.gameSpeed = 5;
+					break;
+				case 51:
+					_this.gameSpeed = 20;
+					break;
+				case 52:
+					_this.gameSpeed = 100;
+					break;
+			}
 		});
 	};
 

@@ -6,6 +6,8 @@ var MAP_HEIGHT = 100
 var TILE_WIDTH = 20
 var TILE_HEIGHT = 20
 
+var MAX_FRAME_DELTA = 100
+
 var Map = require('./map.js')
 var View = require('./view.js')
 var Controller = require('./controller.js')
@@ -37,8 +39,14 @@ function frame(time){
 	var delta = time - lastTime
 	lastTime = time
 
-	for(var entity of map.entities){
-		entity.update(delta)
+	delta *= controller.gameSpeed
+
+	while(delta > 0){
+		var frameDelta = Math.min(delta, MAX_FRAME_DELTA)
+		delta -= frameDelta
+		for(var entity of map.entities){
+			entity.update(frameDelta)
+		}
 	}
 
 	view.render(canvas, ctx)

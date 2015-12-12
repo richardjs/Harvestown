@@ -5,6 +5,7 @@ class Controller{
 		this.mousePos = {x: 0, y: 0}
 		this.draggingView = false
 		this.mouseOut = false
+		this.gameSpeed = 1
 
 		document.addEventListener('mousedown', e => {
 			switch(e.button){
@@ -46,6 +47,24 @@ class Controller{
 		})
 		document.addEventListener('contextmenu', e => {
 			e.preventDefault()
+		})
+
+		document.addEventListener('keydown', e => {
+			//console.log(e.keyCode)
+			switch(e.keyCode){
+				case 49:
+					this.gameSpeed = 1
+					break
+				case 50:
+					this.gameSpeed = 5
+					break
+				case 51:
+					this.gameSpeed = 20
+					break
+				case 52:
+					this.gameSpeed = 100
+					break
+			}
 		})
 	}
 }
