@@ -9,7 +9,7 @@ class House{
 		this.pos = pos
 		this.image = I.HOUSE
 
-		this.map.entities.push(new Villager(this.map, {x: pos.x, y: pos.y}))
+		this.map.entities.push(new Villager(this.map, this))
 	}
 
 	update(){}

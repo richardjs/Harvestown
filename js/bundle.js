@@ -263,11 +263,12 @@
 	var I = __webpack_require__(9);
 
 	var Villager = (function () {
-		function Villager(map, pos) {
+		function Villager(map, house) {
 			_classCallCheck(this, Villager);
 
 			this.map = map;
-			this.pos = pos;
+			this.house = house;
+			this.pos = { x: house.pos.x, y: house.pos.y };
 			this.angle = 0;
 			this.path = [];
 			this.image = I.VILLAGER;
@@ -340,8 +341,8 @@
 				} else {
 					var wanderRange = 5;
 					this.goToTile({
-						x: Math.round(this.tile.x + (Math.random() * 2 * wanderRange - wanderRange)),
-						y: Math.round(this.tile.y + (Math.random() * 2 * wanderRange - wanderRange))
+						x: Math.round(this.map.pixelToTile(this.house.pos).x + (Math.random() * 2 * wanderRange - wanderRange)),
+						y: Math.round(this.map.pixelToTile(this.house.pos).y + (Math.random() * 2 * wanderRange - wanderRange))
 					});
 				}
 			}
@@ -509,7 +510,7 @@
 						ctx.fillRect(x * this.map.tileWidth, y * this.map.tileHeight, this.map.tileWidth, this.map.tileHeight);
 						ctx.strokeStyle = '#040';
 						ctx.lineWidth = .5;
-						ctx.strokeRect(x * this.map.tileWidth, y * this.map.tileHeight, this.map.tileWidth, this.map.tileHeight);
+						//ctx.strokeRect(x*this.map.tileWidth, y*this.map.tileHeight, this.map.tileWidth, this.map.tileHeight)
 					}
 				}
 
@@ -674,7 +675,7 @@
 			this.pos = pos;
 			this.image = I.HOUSE;
 
-			this.map.entities.push(new Villager(this.map, { x: pos.x, y: pos.y }));
+			this.map.entities.push(new Villager(this.map, this));
 		}
 
 		_createClass(House, [{

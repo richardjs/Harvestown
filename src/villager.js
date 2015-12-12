@@ -5,9 +5,10 @@ var I = require('./image.js')
 
 
 class Villager{
-	constructor(map, pos){
+	constructor(map, house){
 		this.map = map
-		this.pos = pos
+		this.house = house
+		this.pos = {x: house.pos.x, y: house.pos.y}
 		this.angle = 0
 		this.path = []
 		this.image = I.VILLAGER
@@ -79,8 +80,8 @@ class Villager{
 		}else{
 			var wanderRange = 5
 			this.goToTile({
-				x: Math.round(this.tile.x + (Math.random()*2*wanderRange - wanderRange)),
-				y: Math.round(this.tile.y + (Math.random()*2*wanderRange - wanderRange))
+				x: Math.round(this.map.pixelToTile(this.house.pos).x + (Math.random()*2*wanderRange - wanderRange)),
+				y: Math.round(this.map.pixelToTile(this.house.pos).y + (Math.random()*2*wanderRange - wanderRange))
 			})
 		}
 	}
