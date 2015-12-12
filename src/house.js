@@ -1,13 +1,19 @@
 'use strict'
 
+var C = require('./constants.js')
 var I = require('./image.js')
 var Villager = require('./villager.js')
 
 class House{
-	constructor(map, pos){
+	constructor(map, pos, startingHouse){
 		this.map = map
 		this.pos = pos
 		this.image = I.HOUSE
+
+		this.food = 0
+		if(startingHouse){
+			this.food = C.HOUSE_STARTING_FOOD
+		}
 
 		this.map.entities.push(new Villager(this.map, this))
 	}

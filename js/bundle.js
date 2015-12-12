@@ -46,10 +46,10 @@
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
 
-	var C = __webpack_require__(6);
-	var Map = __webpack_require__(1);
-	var View = __webpack_require__(3);
-	var Controller = __webpack_require__(5);
+	var C = __webpack_require__(1);
+	var Map = __webpack_require__(2);
+	var View = __webpack_require__(8);
+	var Controller = __webpack_require__(9);
 
 	var canvas = document.createElement('canvas');
 	var ctx = canvas.getContext('2d');
@@ -118,6 +118,39 @@
 
 /***/ },
 /* 1 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	// Map size
+
+	exports.MAP_WIDTH = 100;
+	exports.MAP_HEIGHT = 100;
+
+	// Tile size (game pixels, not view pixels)
+	exports.TILE_WIDTH = 20;
+	exports.TILE_HEIGHT = 20;
+
+	// Villager parameters
+	exports.VILLAGER_SPEED = 20;
+	exports.VILLAGER_WANDER_RANGE = 10;
+	exports.VILLAGER_HUNGER_TIME = 60 * 1000;
+
+	// House parameters
+	exports.HOUSE_STARTING_FOOD = 3;
+	exports.HOUSE_MAX_FOOD = 5;
+
+	// Technical map generation parameters
+	exports.WATER_CELL_RANDOM_START_CHANCE = .47;
+	exports.WATER_GENERATIONS = 50;
+	exports.TREE_CELL_RANDOM_START_CHANCE = .43;
+	exports.TREE_GENERATIONS = 100;
+
+	// Technical engine parameters
+	exports.MAX_FRAME_DELTA = 100;
+
+/***/ },
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -126,9 +159,9 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var C = __webpack_require__(6);
-	var House = __webpack_require__(7);
-	var Villager = __webpack_require__(2);
+	var C = __webpack_require__(1);
+	var House = __webpack_require__(3);
+	var Villager = __webpack_require__(7);
 
 	var Map = (function () {
 		function Map(width, height, tileWidth, tileHeight) {
@@ -182,6 +215,7 @@
 				if (this.atPixel(housePos) !== undefined) {
 					return;
 				}
+				var firstHouse = true;
 				var _iteratorNormalCompletion = true;
 				var _didIteratorError = false;
 				var _iteratorError = undefined;
@@ -193,6 +227,7 @@
 						if (!(entity instanceof House)) {
 							continue;
 						}
+						firstHouse = false;
 						if (entity.pos.x === housePos.x && entity.pos.y === housePos.y) {
 							return;
 						}
@@ -212,7 +247,7 @@
 					}
 				}
 
-				this.entities.push(new House(this, housePos));
+				this.entities.push(new House(this, housePos, firstHouse));
 			}
 		}, {
 			key: 'in',
@@ -250,7 +285,7 @@
 	module.exports = Map;
 
 /***/ },
-/* 2 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -259,8 +294,77 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var C = __webpack_require__(6);
-	var I = __webpack_require__(9);
+	var C = __webpack_require__(1);
+	var I = __webpack_require__(4);
+	var Villager = __webpack_require__(7);
+
+	var House = (function () {
+		function House(map, pos, startingHouse) {
+			_classCallCheck(this, House);
+
+			this.map = map;
+			this.pos = pos;
+			this.image = I.HOUSE;
+
+			this.food = 0;
+			if (startingHouse) {
+				this.food = C.HOUSE_STARTING_FOOD;
+			}
+
+			this.map.entities.push(new Villager(this.map, this));
+		}
+
+		_createClass(House, [{
+			key: 'update',
+			value: function update() {}
+		}, {
+			key: 'tile',
+			get: function get() {
+				return { x: Math.floor(this.pos.x / this.map.tileWidth), y: Math.floor(this.pos.y / this.map.tileHeight) };
+			}
+		}]);
+
+		return House;
+	})();
+
+	module.exports = House;
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.VILLAGER = new Image();
+	exports.VILLAGER.src = __webpack_require__(5);
+
+	exports.HOUSE = new Image();
+	exports.HOUSE.src = __webpack_require__(6);
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAATCAYAAACp65zuAAAABHNCSVQICAgIfAhkiAAAAAFzUkdCAK7OHOkAAAAEZ0FNQQAAsY8L/GEFAAAACXBIWXMAAAIhAAACIQE+ERCTAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAedJREFUOE91Uk1rE1EUPfdNMh1Ga9KYNhBq0biwUqQYKW40FWsEXbiRCq0oFNz4AyyCgrpx49deBLtypQu3CgpCqUGoS4kfSJVCmoxVQsLUSTLX+6bh0Wo98ODcc8+97+M+wgbMAXuV4yzkjg5bYzMTtUik8FnP1INrm4yPQU8ZdBainro9jdTuAS13WpY1qCKH4BGQEtOZKGDg65sP65Qxv/3cnYox/kRyvAk7Lgt6Lb769FEa51ttNanzZusxjL/8RskTtgoQhLZuynu4kiyhVNf5WOQSnHTf7Qil7rPrYme7BcVMg0FwoORjXufpmJj7MpmUCsPlDpEp1BDzSptotF6t/lD9IyMS8/u/TRohUUYusag9KvC8g3KebDe3FbJrnpdXxDy76TG3gHSdUER0Wbg0/T/k/K6KpdO/hPvr0r+Q3Zb6a7WbaluzqTgWK1rMnW7OQLS6jObWQ6Bljnfddd/KCA8vOQ5+Wwq7fB8J4PiNRuO1zm+YTOHFMiWKmjvWGvyOw0NcNZMxxivITiXgP+mGQI/9ZXbu/GSc6TtN3/OMUf8eBVURGtfx8Ok8Dl0oCKMFu9x7xPyeS8CqvNLzKJDyXGF/REXLN3KNtDFqKPDVuGOv7CuOrvYNDZTBVBb5fu/Fu9U/sZCgVMn4yYgAAAAASUVORK5CYII="
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAZCAYAAAArK+5dAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAFZQAABWUB/iX64wAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAFuSURBVEiJ7ZTLTsJAFIb/mU6HTgVsAWOoRoO3gJelcWN8HV/Eh1O3RgzeEhUkEi4FhLbMMHVrIhpZqCHx35/vy59zcgg+hrtzvDifMEpzCdOLY72VsgyHEeJ1ArVxWHC0I8z7SOlqvRf5oPFtsyerlWZ0XfMHZQDyPYztLCZPktzIh2O9mbKYaxrwlEYma5sAAD9QcAQDAGgNVcjaLJ/mywCQaTOsZgQAoNIYQJhGK5DjWq0b+o5gN8+96InlUuaxK8zce5AfqAnFvo7FKFZcKwsgazGK1Yw4mm8FVTo1aZrEID8rAPAv+FsBIbO+5BjxjDcAZn0H/6/i7wVk9q+IkF9ooMbxj8EDqQm7rPv7aZHYtRjfex2pPDfoWqh0McHokjCp9R1QeyDVc2/UGkh9HSh11+iPamdP3fJtU56Sz4ZsG96C4Ac25dtJm+U5idc7oSodFlydFuxqKMf3VT986fTlxWNjdP4wHNYncd4AEvqPtXQfPg8AAAAASUVORK5CYII="
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var C = __webpack_require__(1);
+	var I = __webpack_require__(4);
 
 	var Villager = (function () {
 		function Villager(map, house) {
@@ -328,7 +432,6 @@
 					this.hungerTimer -= delta;
 				} else {
 					this.state = 'hungry';
-					console.log('I\'m hungry');
 				}
 
 				if (this.pixelTarget) {
@@ -363,9 +466,11 @@
 
 						case 'hungry':
 							if (this.tile.x === this.house.tile.x && this.tile.y === this.house.tile.y) {
-								this.state = 'idle';
-								this.hungerTimer = C.VILLAGER_HUNGER_TIME;
-								console.log('burp');
+								if (this.house.food > 0) {
+									this.state = 'idle';
+									this.hungerTimer = C.VILLAGER_HUNGER_TIME;
+									this.house.food--;
+								}
 							} else {
 								this.goToTile(this.house.tile);
 							}
@@ -385,7 +490,7 @@
 	module.exports = Villager;
 
 /***/ },
-/* 3 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -394,8 +499,9 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var I = __webpack_require__(9);
-	var House = __webpack_require__(7);
+	var C = __webpack_require__(1);
+	var I = __webpack_require__(4);
+	var House = __webpack_require__(3);
 
 	var View = (function () {
 		function View(canvas, ctx, map) {
@@ -481,6 +587,17 @@
 						this.ctx.translate(entity.pos.x - this.offset.x, entity.pos.y - this.offset.y);
 						this.ctx.rotate(entity.angle);
 						this.ctx.drawImage(entity.image, -entity.image.width / 2, -entity.image.height / 2);
+						this.ctx.font = 'bold 25px arial';
+						this.ctx.textAlign = 'center';
+						this.ctx.textBaseline = 'middle';
+						if (entity.food > C.HOUSE_MAX_FOOD * .5) {
+							this.ctx.fillStyle = 'green';
+						} else if (entity.food > 0) {
+							this.ctx.fillStyle = 'yellow';
+						} else {
+							this.ctx.fillStyle = 'red';
+						}
+						this.ctx.fillText(entity.food, 0, 1);
 						this.ctx.restore();
 					}
 				} catch (err) {
@@ -536,7 +653,7 @@
 						ctx.fillRect(x * this.map.tileWidth, y * this.map.tileHeight, this.map.tileWidth, this.map.tileHeight);
 						ctx.strokeStyle = '#040';
 						ctx.lineWidth = .5;
-						//ctx.strokeRect(x*this.map.tileWidth, y*this.map.tileHeight, this.map.tileWidth, this.map.tileHeight)
+						ctx.strokeRect(x * this.map.tileWidth, y * this.map.tileHeight, this.map.tileWidth, this.map.tileHeight);
 					}
 				}
 
@@ -551,13 +668,7 @@
 	module.exports = View;
 
 /***/ },
-/* 4 */
-/***/ function(module, exports) {
-
-	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAATCAYAAACp65zuAAAABHNCSVQICAgIfAhkiAAAAAFzUkdCAK7OHOkAAAAEZ0FNQQAAsY8L/GEFAAAACXBIWXMAAAIhAAACIQE+ERCTAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAedJREFUOE91Uk1rE1EUPfdNMh1Ga9KYNhBq0biwUqQYKW40FWsEXbiRCq0oFNz4AyyCgrpx49deBLtypQu3CgpCqUGoS4kfSJVCmoxVQsLUSTLX+6bh0Wo98ODcc8+97+M+wgbMAXuV4yzkjg5bYzMTtUik8FnP1INrm4yPQU8ZdBainro9jdTuAS13WpY1qCKH4BGQEtOZKGDg65sP65Qxv/3cnYox/kRyvAk7Lgt6Lb769FEa51ttNanzZusxjL/8RskTtgoQhLZuynu4kiyhVNf5WOQSnHTf7Qil7rPrYme7BcVMg0FwoORjXufpmJj7MpmUCsPlDpEp1BDzSptotF6t/lD9IyMS8/u/TRohUUYusag9KvC8g3KebDe3FbJrnpdXxDy76TG3gHSdUER0Wbg0/T/k/K6KpdO/hPvr0r+Q3Zb6a7WbaluzqTgWK1rMnW7OQLS6jObWQ6Bljnfddd/KCA8vOQ5+Wwq7fB8J4PiNRuO1zm+YTOHFMiWKmjvWGvyOw0NcNZMxxivITiXgP+mGQI/9ZXbu/GSc6TtN3/OMUf8eBVURGtfx8Ok8Dl0oCKMFu9x7xPyeS8CqvNLzKJDyXGF/REXLN3KNtDFqKPDVuGOv7CuOrvYNDZTBVBb5fu/Fu9U/sZCgVMn4yYgAAAAASUVORK5CYII="
-
-/***/ },
-/* 5 */
+/* 9 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -652,92 +763,6 @@
 	};
 
 	module.exports = Controller;
-
-/***/ },
-/* 6 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	// Map size
-
-	exports.MAP_WIDTH = 100;
-	exports.MAP_HEIGHT = 100;
-
-	// Tile size (game pixels, not view pixels)
-	exports.TILE_WIDTH = 20;
-	exports.TILE_HEIGHT = 20;
-
-	// Villager parameters
-	exports.VILLAGER_SPEED = 20;
-	exports.VILLAGER_WANDER_RANGE = 10;
-	exports.VILLAGER_HUNGER_TIME = 60 * 1000;
-
-	// Technical map generation parameters
-	exports.WATER_CELL_RANDOM_START_CHANCE = .47;
-	exports.WATER_GENERATIONS = 50;
-	exports.TREE_CELL_RANDOM_START_CHANCE = .43;
-	exports.TREE_GENERATIONS = 100;
-
-	// Technical engine parameters
-	exports.MAX_FRAME_DELTA = 100;
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var I = __webpack_require__(9);
-	var Villager = __webpack_require__(2);
-
-	var House = (function () {
-		function House(map, pos) {
-			_classCallCheck(this, House);
-
-			this.map = map;
-			this.pos = pos;
-			this.image = I.HOUSE;
-
-			this.map.entities.push(new Villager(this.map, this));
-		}
-
-		_createClass(House, [{
-			key: 'update',
-			value: function update() {}
-		}, {
-			key: 'tile',
-			get: function get() {
-				return { x: Math.floor(this.pos.x / this.map.tileWidth), y: Math.floor(this.pos.y / this.map.tileHeight) };
-			}
-		}]);
-
-		return House;
-	})();
-
-	module.exports = House;
-
-/***/ },
-/* 8 */
-/***/ function(module, exports) {
-
-	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAZCAYAAAArK+5dAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAFZQAABWUB/iX64wAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAFuSURBVEiJ7ZTLTsJAFIb/mU6HTgVsAWOoRoO3gJelcWN8HV/Eh1O3RgzeEhUkEi4FhLbMMHVrIhpZqCHx35/vy59zcgg+hrtzvDifMEpzCdOLY72VsgyHEeJ1ArVxWHC0I8z7SOlqvRf5oPFtsyerlWZ0XfMHZQDyPYztLCZPktzIh2O9mbKYaxrwlEYma5sAAD9QcAQDAGgNVcjaLJ/mywCQaTOsZgQAoNIYQJhGK5DjWq0b+o5gN8+96InlUuaxK8zce5AfqAnFvo7FKFZcKwsgazGK1Yw4mm8FVTo1aZrEID8rAPAv+FsBIbO+5BjxjDcAZn0H/6/i7wVk9q+IkF9ooMbxj8EDqQm7rPv7aZHYtRjfex2pPDfoWqh0McHokjCp9R1QeyDVc2/UGkh9HSh11+iPamdP3fJtU56Sz4ZsG96C4Ac25dtJm+U5idc7oSodFlydFuxqKMf3VT986fTlxWNjdP4wHNYncd4AEvqPtXQfPg8AAAAASUVORK5CYII="
-
-/***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	exports.VILLAGER = new Image();
-	exports.VILLAGER.src = __webpack_require__(4);
-
-	exports.HOUSE = new Image();
-	exports.HOUSE.src = __webpack_require__(8);
 
 /***/ }
 /******/ ]);

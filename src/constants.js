@@ -13,6 +13,10 @@ exports.VILLAGER_SPEED = 20
 exports.VILLAGER_WANDER_RANGE = 10
 exports.VILLAGER_HUNGER_TIME = 60*1000
 
+// House parameters
+exports.HOUSE_STARTING_FOOD = 3
+exports.HOUSE_MAX_FOOD = 5
+
 // Technical map generation parameters
 exports.WATER_CELL_RANDOM_START_CHANCE = .47
 exports.WATER_GENERATIONS = 50

@@ -67,7 +67,6 @@ class Villager{
 			this.hungerTimer -= delta
 		}else{
 			this.state = 'hungry'
-			console.log('I\'m hungry')
 		}
 
 		if(this.pixelTarget){
@@ -102,9 +101,11 @@ class Villager{
 
 				case 'hungry':
 					if(this.tile.x === this.house.tile.x && this.tile.y === this.house.tile.y){
-						this.state = 'idle'
-						this.hungerTimer = C.VILLAGER_HUNGER_TIME
-						console.log('burp')
+						if(this.house.food > 0){
+							this.state = 'idle'
+							this.hungerTimer = C.VILLAGER_HUNGER_TIME
+							this.house.food--
+						}
 					}else{
 						this.goToTile(this.house.tile)
 					}

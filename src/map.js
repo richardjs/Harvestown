@@ -49,15 +49,17 @@ class Map{
 		if(this.atPixel(housePos) !== undefined){
 			return
 		}
+		var firstHouse = true
 		for(var entity of this.entities){
 			if(!(entity instanceof House)){
 				continue
 			}
+			firstHouse = false
 			if(entity.pos.x === housePos.x && entity.pos.y === housePos.y){
 				return
 			}
 		}
-		this.entities.push(new House(this, housePos))
+		this.entities.push(new House(this, housePos, firstHouse))
 	}
 
 	in(pos){

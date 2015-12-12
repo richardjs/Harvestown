@@ -1,5 +1,6 @@
 'use strict'
 
+var C = require('./constants.js')
 var I = require('./image.js')
 var House = require('./house.js')
 
@@ -62,6 +63,17 @@ class View{
 			)
 			this.ctx.rotate(entity.angle)
 			this.ctx.drawImage(entity.image, - entity.image.width/2, -entity.image.height/2)
+			this.ctx.font = 'bold 25px arial'
+			this.ctx.textAlign = 'center'
+			this.ctx.textBaseline = 'middle'
+			if(entity.food > C.HOUSE_MAX_FOOD * .5){
+				this.ctx.fillStyle = 'green'
+			}else if(entity.food > 0){
+				this.ctx.fillStyle = 'yellow'
+			}else{
+				this.ctx.fillStyle = 'red'
+			}
+			this.ctx.fillText(entity.food, 0, 1)
 			this.ctx.restore()
 		}
 
@@ -101,7 +113,7 @@ class View{
 				ctx.fillRect(x*this.map.tileWidth, y*this.map.tileHeight, this.map.tileWidth, this.map.tileHeight)
 				ctx.strokeStyle = '#040'
 				ctx.lineWidth = .5
-				//ctx.strokeRect(x*this.map.tileWidth, y*this.map.tileHeight, this.map.tileWidth, this.map.tileHeight)
+				ctx.strokeRect(x*this.map.tileWidth, y*this.map.tileHeight, this.map.tileWidth, this.map.tileHeight)
 			}
 		}
 
