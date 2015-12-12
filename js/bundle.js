@@ -83,6 +83,31 @@
 		var delta = time - lastTime;
 		lastTime = time;
 
+		var _iteratorNormalCompletion = true;
+		var _didIteratorError = false;
+		var _iteratorError = undefined;
+
+		try {
+			for (var _iterator = map.entities[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+				var entity = _step.value;
+
+				entity.update(delta);
+			}
+		} catch (err) {
+			_didIteratorError = true;
+			_iteratorError = err;
+		} finally {
+			try {
+				if (!_iteratorNormalCompletion && _iterator.return) {
+					_iterator.return();
+				}
+			} finally {
+				if (_didIteratorError) {
+					throw _iteratorError;
+				}
+			}
+		}
+
 		view.render(canvas, ctx);
 
 		requestAnimationFrame(frame);
@@ -183,13 +208,18 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	var VILLAGER_SPEED = 20;
+
 	var Villager = (function () {
 		function Villager(map, pos) {
 			_classCallCheck(this, Villager);
 
 			this.map = map;
 			this.pos = pos;
+			this.angle = 0;
 			this.path = [];
+
+			this.pixelTarget = null;
 		}
 
 		_createClass(Villager, [{
@@ -197,12 +227,61 @@
 			value: function goToTile(pos) {
 				var _this = this;
 
+				this.path = [];
 				var dijkstra = new ROT.Path.Dijkstra(pos.x, pos.y, function (x, y) {
 					return _this.map.at({ x: x, y: y }) !== 'water';
 				});
 				dijkstra.compute(this.tile.x, this.tile.y, function (x, y) {
 					_this.path.push({ x: x, y: y });
 				});
+				this.path.shift();
+				this.nextPathNode();
+			}
+		}, {
+			key: 'setPixelTarget',
+			value: function setPixelTarget(pos) {
+				this.pixelTarget = pos;
+				this.angle = Math.atan2(this.pixelTarget.y - this.pos.y, this.pixelTarget.x - this.pos.x);
+			}
+		}, {
+			key: 'setMapTarget',
+			value: function setMapTarget(pos) {
+				this.setPixelTarget({
+					x: pos.x * this.map.tileWidth + this.map.tileWidth / 2,
+					y: pos.y * this.map.tileHeight + this.map.tileHeight / 2
+				});
+			}
+		}, {
+			key: 'nextPathNode',
+			value: function nextPathNode() {
+				if (this.path.length === 0) {
+					this.pixelTarget = null;
+					return;
+				}
+				this.setMapTarget(this.path.shift());
+			}
+		}, {
+			key: 'update',
+			value: function update(delta) {
+				if (this.pixelTarget) {
+					var dx = Math.cos(this.angle) * VILLAGER_SPEED * delta / 1000;
+					var dy = Math.sin(this.angle) * VILLAGER_SPEED * delta / 1000;
+
+					if (Math.abs(this.pos.x - this.pixelTarget.x) < Math.abs(dx)) {
+						this.pos.x = this.pixelTarget.x;
+					} else {
+						this.pos.x += dx;
+					}
+					if (Math.abs(this.pos.y - this.pixelTarget.y) < Math.abs(dy)) {
+						this.pos.y = this.pixelTarget.y;
+					} else {
+						this.pos.y += dy;
+					}
+
+					if (this.pos.x === this.pixelTarget.x && this.pos.y === this.pixelTarget.y) {
+						this.nextPathNode();
+					}
+				}
 			}
 		}, {
 			key: 'tile',
@@ -267,7 +346,11 @@
 					for (var _iterator = this.map.entities[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 						var entity = _step.value;
 
-						this.ctx.drawImage(VILLAGER_IMAGE, entity.pos.x - this.offset.x - VILLAGER_IMAGE.width / 2, entity.pos.y - this.offset.y - VILLAGER_IMAGE.height / 2);
+						this.ctx.save();
+						this.ctx.translate(entity.pos.x - this.offset.x, entity.pos.y - this.offset.y);
+						this.ctx.rotate(entity.angle);
+						this.ctx.drawImage(VILLAGER_IMAGE, -VILLAGER_IMAGE.width / 2, -VILLAGER_IMAGE.height / 2);
+						this.ctx.restore();
 					}
 				} catch (err) {
 					_didIteratorError = true;
@@ -311,6 +394,8 @@
 								this.ctx.fillStyle = '#171';
 						}
 						this.ctx.fillRect(x * this.map.tileWidth - subTileOffset.x, y * this.map.tileHeight - subTileOffset.y, this.map.tileWidth, this.map.tileHeight);
+						this.ctx.strokeStyle = '#040';
+						this.ctx.lineWidth = .5;
 						this.ctx.strokeRect(x * this.map.tileWidth - subTileOffset.x, y * this.map.tileHeight - subTileOffset.y, this.map.tileWidth, this.map.tileHeight);
 					}
 				}
@@ -326,7 +411,7 @@
 /* 4 */
 /***/ function(module, exports) {
 
-	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAKCAYAAABWiWWfAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAACIQAAAiEBPhEQkwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAHHSURBVCiRfZE7aFNxGMV/3z83N72SBiK9SWhpi60PpIOQJZZCtZaugs+xdHByExHXdNBBiziLkMkH4gMdFEE7VHRRIro0KKa+KDZpUyOhvU2893OxGqXp2T445wfnOwJQu3UmFT1+8RtN2g+WOzBgvMXFtIFREwRb3HI5ewUazT7NZk2tr9bRPj5VkrUbp86BnFXleeOnOdY+PlUCOJhIJA3kgc71oMAnVCfvlcs5AL1+uqMuPABNA5cMao4AIRGGI+GgK0Mmdt5xhizVN80gAIVeA5cno9GRDJlYQ7QbdBCIoHLYAqh8LDE3M0t++v3NORnZ8dUuSCDCRvJFYlWY/iwJvTBxrXhgtJu+4d3EexJYL3NP3XdP3oKCYu8UgVagdX1xHBzPE9bq/YWHeQqP8uwa2+Oa4rOCj/412qbOkhXeFBbxAzy/7Z/+xZnZhgk8b1DQO/xeqR7YbF9Z2RTW63nNZwP0tu95Q9YEfAA9ehXd6tG2r0e/nzRoLKSa9kWs/0EhVV/QV11a/VHFyaVYfnwCKgAtn3MomUyo6muFTvlThlW1rLH78/MvNsqYVrDlhYVK2HW3IbIXuCsiqbDrxuO2nW+V+QVhkqzcQPxdCwAAAABJRU5ErkJggg=="
+	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAATCAYAAACp65zuAAAABHNCSVQICAgIfAhkiAAAAAFzUkdCAK7OHOkAAAAEZ0FNQQAAsY8L/GEFAAAACXBIWXMAAAIhAAACIQE+ERCTAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAedJREFUOE91Uk1rE1EUPfdNMh1Ga9KYNhBq0biwUqQYKW40FWsEXbiRCq0oFNz4AyyCgrpx49deBLtypQu3CgpCqUGoS4kfSJVCmoxVQsLUSTLX+6bh0Wo98ODcc8+97+M+wgbMAXuV4yzkjg5bYzMTtUik8FnP1INrm4yPQU8ZdBainro9jdTuAS13WpY1qCKH4BGQEtOZKGDg65sP65Qxv/3cnYox/kRyvAk7Lgt6Lb769FEa51ttNanzZusxjL/8RskTtgoQhLZuynu4kiyhVNf5WOQSnHTf7Qil7rPrYme7BcVMg0FwoORjXufpmJj7MpmUCsPlDpEp1BDzSptotF6t/lD9IyMS8/u/TRohUUYusag9KvC8g3KebDe3FbJrnpdXxDy76TG3gHSdUER0Wbg0/T/k/K6KpdO/hPvr0r+Q3Zb6a7WbaluzqTgWK1rMnW7OQLS6jObWQ6Bljnfddd/KCA8vOQ5+Wwq7fB8J4PiNRuO1zm+YTOHFMiWKmjvWGvyOw0NcNZMxxivITiXgP+mGQI/9ZXbu/GSc6TtN3/OMUf8eBVURGtfx8Ok8Dl0oCKMFu9x7xPyeS8CqvNLzKJDyXGF/REXLN3KNtDFqKPDVuGOv7CuOrvYNDZTBVBb5fu/Fu9U/sZCgVMn4yYgAAAAASUVORK5CYII="
 
 /***/ },
 /* 5 */

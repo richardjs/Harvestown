@@ -29,11 +29,14 @@ class View{
 	render(){
 		this.renderTiles()
 		for(var entity of this.map.entities){
-			this.ctx.drawImage(
-				VILLAGER_IMAGE,
-				entity.pos.x - this.offset.x - VILLAGER_IMAGE.width/2,
-				entity.pos.y - this.offset.y - VILLAGER_IMAGE.height/2
+			this.ctx.save()
+			this.ctx.translate(
+				entity.pos.x - this.offset.x,
+				entity.pos.y - this.offset.y
 			)
+			this.ctx.rotate(entity.angle)
+			this.ctx.drawImage(VILLAGER_IMAGE, - VILLAGER_IMAGE.width/2, -VILLAGER_IMAGE.height/2)
+			this.ctx.restore()
 		}
 	}
 
@@ -62,6 +65,8 @@ class View{
 						this.ctx.fillStyle = '#171'
 				}
 				this.ctx.fillRect(x*this.map.tileWidth - subTileOffset.x, y*this.map.tileHeight - subTileOffset.y, this.map.tileWidth, this.map.tileHeight);
+				this.ctx.strokeStyle = '#040'
+				this.ctx.lineWidth = .5
 				this.ctx.strokeRect(x*this.map.tileWidth - subTileOffset.x, y*this.map.tileHeight - subTileOffset.y, this.map.tileWidth, this.map.tileHeight);
 			}
 		}

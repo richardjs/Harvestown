@@ -37,6 +37,10 @@ function frame(time){
 	var delta = time - lastTime
 	lastTime = time
 
+	for(var entity of map.entities){
+		entity.update(delta)
+	}
+
 	view.render(canvas, ctx)
 	
 	requestAnimationFrame(frame)
