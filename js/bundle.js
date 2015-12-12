@@ -179,6 +179,9 @@
 			key: 'placeHouse',
 			value: function placeHouse(pos) {
 				var housePos = this.tileToPixel(this.pixelToTile(pos));
+				if (this.atPixel(housePos) !== undefined) {
+					return;
+				}
 				var _iteratorNormalCompletion = true;
 				var _didIteratorError = false;
 				var _iteratorError = undefined;

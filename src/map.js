@@ -46,6 +46,9 @@ class Map{
 
 	placeHouse(pos){
 		var housePos = this.tileToPixel(this.pixelToTile(pos))
+		if(this.atPixel(housePos) !== undefined){
+			return
+		}
 		for(var entity of this.entities){
 			if(!(entity instanceof House)){
 				continue
