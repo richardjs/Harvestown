@@ -149,10 +149,6 @@
 			this.tileWidth = tileWidth;
 			this.tileHeight = tileHeight;
 
-			this.data = [];
-			for (var i = 0; i < width; i++) {
-				this.data.push([]);
-			}
 			this.generateGeography();
 
 			this.entities = [];
@@ -164,6 +160,10 @@
 			value: function generateGeography() {
 				var _this = this;
 
+				this.data = [];
+				for (var i = 0; i < this.width; i++) {
+					this.data.push([]);
+				}
 				var map = new ROT.Map.Cellular(this.width, this.height);
 				map.randomize(TREE_CELL_RANDOM_START_CHANCE);
 				for (var i = 0; i < TREE_GENERATIONS; i++) {
@@ -338,6 +338,8 @@
 			this.ctx = ctx;
 			this.map = map;
 			this.offset = { x: 0, y: 0 };
+
+			this.tileImage = null;
 		}
 
 		_createClass(View, [{
@@ -392,35 +394,40 @@
 		}, {
 			key: 'renderTiles',
 			value: function renderTiles() {
-				var tileOffset = {
-					x: Math.floor(this.offset.x / this.map.tileWidth),
-					y: Math.floor(this.offset.y / this.map.tileHeight)
-				};
-				var subTileOffset = {
-					x: this.offset.x % this.map.tileWidth,
-					y: this.offset.y % this.map.tileHeight
-				};
+				if (!this.tileImage) {
+					this.updateTileImage();
+				}
+				this.ctx.drawImage(this.tileImage, -this.offset.x, -this.offset.y);
+			}
+		}, {
+			key: 'updateTileImage',
+			value: function updateTileImage() {
+				var canvas = document.createElement('canvas');
+				var ctx = canvas.getContext('2d');
+				canvas.width = this.map.width * this.map.tileWidth;
+				canvas.height = this.map.height * this.map.tileHeight;
+
 				for (var x = 0; x < this.map.width; x++) {
 					for (var y = 0; y < this.map.height; y++) {
-						if (!this.map.data[x + tileOffset.x]) {
-							continue;
-						}
-						switch (this.map.data[x + tileOffset.x][y + tileOffset.y]) {
+						switch (this.map.data[x][y]) {
 							case 'water':
-								this.ctx.fillStyle = '#008';
+								ctx.fillStyle = '#008';
 								break;
 							case 'tree':
-								this.ctx.fillStyle = '#840';
+								ctx.fillStyle = '#840';
 								break;
 							default:
-								this.ctx.fillStyle = '#171';
+								ctx.fillStyle = '#171';
 						}
-						this.ctx.fillRect(x * this.map.tileWidth - subTileOffset.x, y * this.map.tileHeight - subTileOffset.y, this.map.tileWidth, this.map.tileHeight);
-						this.ctx.strokeStyle = '#040';
-						this.ctx.lineWidth = .5;
-						this.ctx.strokeRect(x * this.map.tileWidth - subTileOffset.x, y * this.map.tileHeight - subTileOffset.y, this.map.tileWidth, this.map.tileHeight);
+						ctx.fillRect(x * this.map.tileWidth, y * this.map.tileHeight, this.map.tileWidth, this.map.tileHeight);
+						ctx.strokeStyle = '#040';
+						ctx.lineWidth = .5;
+						ctx.strokeRect(x * this.map.tileWidth, y * this.map.tileHeight, this.map.tileWidth, this.map.tileHeight);
 					}
 				}
+
+				this.tileImage = new Image();
+				this.tileImage.src = canvas.toDataURL();
 			}
 		}]);
 

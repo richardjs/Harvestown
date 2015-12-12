@@ -14,10 +14,6 @@ class Map{
 		this.tileWidth = tileWidth
 		this.tileHeight = tileHeight
 
-		this.data = []
-		for(var i = 0; i < width; i++){
-			this.data.push([])
-		}
 		this.generateGeography()
 
 		this.entities = []
@@ -25,6 +21,10 @@ class Map{
 	}
 
 	generateGeography(){
+		this.data = []
+		for(var i = 0; i < this.width; i++){
+			this.data.push([])
+		}
 		var map = new ROT.Map.Cellular(this.width, this.height)
 		map.randomize(TREE_CELL_RANDOM_START_CHANCE)
 		for(var i = 0; i < TREE_GENERATIONS; i++){
