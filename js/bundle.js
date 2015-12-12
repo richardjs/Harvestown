@@ -46,14 +46,7 @@
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
 
-	var MAP_WIDTH = 100;
-	var MAP_HEIGHT = 100;
-
-	var TILE_WIDTH = 20;
-	var TILE_HEIGHT = 20;
-
-	var MAX_FRAME_DELTA = 100;
-
+	var C = __webpack_require__(6);
 	var Map = __webpack_require__(1);
 	var View = __webpack_require__(3);
 	var Controller = __webpack_require__(5);
@@ -69,7 +62,7 @@
 		canvas.height = window.innerHeight;
 	});
 
-	global.map = new Map(MAP_WIDTH, MAP_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+	global.map = new Map(C.MAP_WIDTH, C.MAP_HEIGHT, C.TILE_WIDTH, C.TILE_HEIGHT);
 	global.view = new View(canvas, ctx, map);
 	global.controller = new Controller();
 
@@ -88,7 +81,7 @@
 		delta *= controller.gameSpeed;
 
 		while (delta > 0) {
-			var frameDelta = Math.min(delta, MAX_FRAME_DELTA);
+			var frameDelta = Math.min(delta, C.MAX_FRAME_DELTA);
 			delta -= frameDelta;
 			var _iteratorNormalCompletion = true;
 			var _didIteratorError = false;
@@ -133,12 +126,8 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	var C = __webpack_require__(6);
 	var Villager = __webpack_require__(2);
-
-	var WATER_CELL_RANDOM_START_CHANCE = .47;
-	var WATER_GENERATIONS = 50;
-	var TREE_CELL_RANDOM_START_CHANCE = .43;
-	var TREE_GENERATIONS = 100;
 
 	var Map = (function () {
 		function Map(width, height, tileWidth, tileHeight) {
@@ -165,8 +154,8 @@
 					this.data.push([]);
 				}
 				var map = new ROT.Map.Cellular(this.width, this.height);
-				map.randomize(TREE_CELL_RANDOM_START_CHANCE);
-				for (var i = 0; i < TREE_GENERATIONS; i++) {
+				map.randomize(C.TREE_CELL_RANDOM_START_CHANCE);
+				for (var i = 0; i < C.TREE_GENERATIONS; i++) {
 					map.create();
 				}
 				map.create(function (x, y, value) {
@@ -176,8 +165,8 @@
 				});
 
 				map = new ROT.Map.Cellular(this.width, this.height);
-				map.randomize(WATER_CELL_RANDOM_START_CHANCE);
-				for (var i = 0; i < WATER_GENERATIONS; i++) {
+				map.randomize(C.WATER_CELL_RANDOM_START_CHANCE);
+				for (var i = 0; i < C.WATER_GENERATIONS; i++) {
 					map.create();
 				}
 				map.create(function (x, y, value) {
@@ -213,7 +202,7 @@
 
 /***/ },
 /* 2 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -221,7 +210,7 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var VILLAGER_SPEED = 20;
+	var C = __webpack_require__(6);
 
 	var Villager = (function () {
 		function Villager(map, pos) {
@@ -280,8 +269,8 @@
 			key: 'update',
 			value: function update(delta) {
 				if (this.pixelTarget) {
-					var dx = Math.cos(this.angle) * VILLAGER_SPEED * delta / 1000;
-					var dy = Math.sin(this.angle) * VILLAGER_SPEED * delta / 1000;
+					var dx = Math.cos(this.angle) * C.VILLAGER_SPEED * delta / 1000;
+					var dy = Math.sin(this.angle) * C.VILLAGER_SPEED * delta / 1000;
 
 					if (Math.abs(this.pos.x - this.pixelTarget.x) < Math.abs(dx)) {
 						this.pos.x = this.pixelTarget.x;
@@ -522,6 +511,33 @@
 	};
 
 	module.exports = Controller;
+
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	// Map size
+
+	exports.MAP_WIDTH = 100;
+	exports.MAP_HEIGHT = 100;
+
+	// Tile size (game pixels, not view pixels)
+	exports.TILE_WIDTH = 20;
+	exports.TILE_HEIGHT = 20;
+
+	// Villager parameters
+	exports.VILLAGER_SPEED = 20;
+
+	// Technical map generation parameters
+	exports.WATER_CELL_RANDOM_START_CHANCE = .47;
+	exports.WATER_GENERATIONS = 50;
+	exports.TREE_CELL_RANDOM_START_CHANCE = .43;
+	exports.TREE_GENERATIONS = 100;
+
+	// Technical engine parameters
+	exports.MAX_FRAME_DELTA = 100;
 
 /***/ }
 /******/ ]);

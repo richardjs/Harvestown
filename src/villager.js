@@ -1,6 +1,6 @@
 'use strict'
 
-var VILLAGER_SPEED = 20
+var C = require('./constants.js')
 
 class Villager{
 	constructor(map, pos){
@@ -56,8 +56,8 @@ class Villager{
 
 	update(delta){
 		if(this.pixelTarget){
-			var dx = Math.cos(this.angle) * VILLAGER_SPEED * delta/1000
-			var dy = Math.sin(this.angle) * VILLAGER_SPEED * delta/1000
+			var dx = Math.cos(this.angle) * C.VILLAGER_SPEED * delta/1000
+			var dy = Math.sin(this.angle) * C.VILLAGER_SPEED * delta/1000
 
 			if(Math.abs(this.pos.x - this.pixelTarget.x) < Math.abs(dx)){
 				this.pos.x = this.pixelTarget.x
