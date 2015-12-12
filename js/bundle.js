@@ -160,6 +160,7 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var C = __webpack_require__(1);
+	var Farm = __webpack_require__(11);
 	var House = __webpack_require__(3);
 	var Villager = __webpack_require__(7);
 
@@ -209,13 +210,12 @@
 				});
 			}
 		}, {
-			key: 'placeHouse',
-			value: function placeHouse(pos) {
-				var housePos = this.tileToPixel(this.pixelToTile(pos));
-				if (this.atPixel(housePos) !== undefined) {
+			key: 'placeFarm',
+			value: function placeFarm(pos) {
+				var farmPos = this.tileToPixel(this.pixelToTile(pos));
+				if (this.atPixel(farmPos) !== undefined) {
 					return;
 				}
-				var firstHouse = true;
 				var _iteratorNormalCompletion = true;
 				var _didIteratorError = false;
 				var _iteratorError = undefined;
@@ -224,11 +224,10 @@
 					for (var _iterator = this.entities[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 						var entity = _step.value;
 
-						if (!(entity instanceof House)) {
+						if (entity instanceof Villager) {
 							continue;
 						}
-						firstHouse = false;
-						if (entity.pos.x === housePos.x && entity.pos.y === housePos.y) {
+						if (entity.pos.x === farmPos.x && entity.pos.y === farmPos.y) {
 							return;
 						}
 					}
@@ -243,6 +242,47 @@
 					} finally {
 						if (_didIteratorError) {
 							throw _iteratorError;
+						}
+					}
+				}
+
+				this.entities.push(new Farm(this, farmPos));
+			}
+		}, {
+			key: 'placeHouse',
+			value: function placeHouse(pos) {
+				var housePos = this.tileToPixel(this.pixelToTile(pos));
+				if (this.atPixel(housePos) !== undefined) {
+					return;
+				}
+				var firstHouse = true;
+				var _iteratorNormalCompletion2 = true;
+				var _didIteratorError2 = false;
+				var _iteratorError2 = undefined;
+
+				try {
+					for (var _iterator2 = this.entities[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+						var entity = _step2.value;
+
+						if (!(entity instanceof House)) {
+							continue;
+						}
+						firstHouse = false;
+						if (entity.pos.x === housePos.x && entity.pos.y === housePos.y) {
+							return;
+						}
+					}
+				} catch (err) {
+					_didIteratorError2 = true;
+					_iteratorError2 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion2 && _iterator2.return) {
+							_iterator2.return();
+						}
+					} finally {
+						if (_didIteratorError2) {
+							throw _iteratorError2;
 						}
 					}
 				}
@@ -341,6 +381,11 @@
 	exports.HOUSE = new Image();
 	exports.HOUSE.src = __webpack_require__(6);
 
+	exports.FARM_UNPLANTED = new Image();
+	exports.FARM_UNPLANTED.src = __webpack_require__(12);
+	exports.FARM_BARE = new Image();
+	exports.FARM_BARE.src = __webpack_require__(10);
+
 /***/ },
 /* 5 */
 /***/ function(module, exports) {
@@ -365,6 +410,7 @@
 
 	var C = __webpack_require__(1);
 	var I = __webpack_require__(4);
+	var Farm = __webpack_require__(11);
 
 	var Villager = (function () {
 		function Villager(map, house) {
@@ -382,6 +428,7 @@
 			this.image = I.VILLAGER;
 
 			this.pixelTarget = null;
+			this.activeFarm = null;
 		}
 
 		_createClass(Villager, [{
@@ -455,13 +502,60 @@
 					}
 				} else {
 					// We've reacher our destination
+					if (this.activeFarm) {
+						if (this.activeFarm.tile.x === this.tile.x && this.activeFarm.tile.y === this.tile.y) {
+							if (this.activeFarm.state === 'unplanted') {
+								this.activeFarm.plant();
+								this.activeFarm = null;
+							}
+						}
+					}
+
 					switch (this.state) {
 						case 'idle':
-							var wanderRange = C.VILLAGER_WANDER_RANGE;
-							this.goToTile({
-								x: Math.round(this.map.pixelToTile(this.house.pos).x + (Math.random() * 2 * wanderRange - wanderRange)),
-								y: Math.round(this.map.pixelToTile(this.house.pos).y + (Math.random() * 2 * wanderRange - wanderRange))
-							});
+							var _iteratorNormalCompletion = true;
+							var _didIteratorError = false;
+							var _iteratorError = undefined;
+
+							try {
+								for (var _iterator = this.map.entities[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+									var entity = _step.value;
+
+									if (entity instanceof Farm) {
+										if (entity.state === 'unplanted') {
+											if (entity.activeVillager) {
+												continue;
+											}
+											entity.activeVillager = this;
+											this.activeFarm = entity;
+											this.goToTile(entity.tile);
+											//this.state = 'planting'
+											return;
+										}
+									}
+								}
+							} catch (err) {
+								_didIteratorError = true;
+								_iteratorError = err;
+							} finally {
+								try {
+									if (!_iteratorNormalCompletion && _iterator.return) {
+										_iterator.return();
+									}
+								} finally {
+									if (_didIteratorError) {
+										throw _iteratorError;
+									}
+								}
+							}
+
+							if (this.state === 'idle') {
+								var wanderRange = C.VILLAGER_WANDER_RANGE;
+								this.goToTile({
+									x: Math.round(this.map.pixelToTile(this.house.pos).x + (Math.random() * 2 * wanderRange - wanderRange)),
+									y: Math.round(this.map.pixelToTile(this.house.pos).y + (Math.random() * 2 * wanderRange - wanderRange))
+								});
+							}
 							break;
 
 						case 'hungry':
@@ -501,7 +595,9 @@
 
 	var C = __webpack_require__(1);
 	var I = __webpack_require__(4);
+	var Farm = __webpack_require__(11);
 	var House = __webpack_require__(3);
+	var Villager = __webpack_require__(7);
 
 	var View = (function () {
 		function View(canvas, ctx, map) {
@@ -541,6 +637,9 @@
 			key: 'render',
 			value: function render() {
 				this.renderTiles();
+
+				var farms = [];
+				var villagers = [];
 				var houses = [];
 				var _iteratorNormalCompletion = true;
 				var _didIteratorError = false;
@@ -550,15 +649,14 @@
 					for (var _iterator = this.map.entities[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 						var entity = _step.value;
 
-						if (entity instanceof House) {
+						if (entity instanceof Farm) {
+							farms.push(entity);
+						} else if (entity instanceof Villager) {
+							villagers.push(entity);
+						} else if (entity instanceof House) {
 							houses.push(entity);
 							continue;
 						}
-						this.ctx.save();
-						this.ctx.translate(entity.pos.x - this.offset.x, entity.pos.y - this.offset.y);
-						this.ctx.rotate(entity.angle);
-						this.ctx.drawImage(entity.image, -entity.image.width / 2, -entity.image.height / 2);
-						this.ctx.restore();
 					}
 				} catch (err) {
 					_didIteratorError = true;
@@ -580,24 +678,12 @@
 				var _iteratorError2 = undefined;
 
 				try {
-					for (var _iterator2 = houses[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+					for (var _iterator2 = farms[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
 						var entity = _step2.value;
 
 						this.ctx.save();
 						this.ctx.translate(entity.pos.x - this.offset.x, entity.pos.y - this.offset.y);
-						this.ctx.rotate(entity.angle);
 						this.ctx.drawImage(entity.image, -entity.image.width / 2, -entity.image.height / 2);
-						this.ctx.font = 'bold 25px arial';
-						this.ctx.textAlign = 'center';
-						this.ctx.textBaseline = 'middle';
-						if (entity.food > C.HOUSE_MAX_FOOD * .5) {
-							this.ctx.fillStyle = 'green';
-						} else if (entity.food > 0) {
-							this.ctx.fillStyle = 'yellow';
-						} else {
-							this.ctx.fillStyle = 'red';
-						}
-						this.ctx.fillText(entity.food, 0, 1);
 						this.ctx.restore();
 					}
 				} catch (err) {
@@ -615,10 +701,85 @@
 					}
 				}
 
+				var _iteratorNormalCompletion3 = true;
+				var _didIteratorError3 = false;
+				var _iteratorError3 = undefined;
+
+				try {
+					for (var _iterator3 = villagers[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+						var entity = _step3.value;
+
+						this.ctx.save();
+						this.ctx.translate(entity.pos.x - this.offset.x, entity.pos.y - this.offset.y);
+						this.ctx.rotate(entity.angle);
+						this.ctx.drawImage(entity.image, -entity.image.width / 2, -entity.image.height / 2);
+						this.ctx.restore();
+					}
+				} catch (err) {
+					_didIteratorError3 = true;
+					_iteratorError3 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion3 && _iterator3.return) {
+							_iterator3.return();
+						}
+					} finally {
+						if (_didIteratorError3) {
+							throw _iteratorError3;
+						}
+					}
+				}
+
+				var _iteratorNormalCompletion4 = true;
+				var _didIteratorError4 = false;
+				var _iteratorError4 = undefined;
+
+				try {
+					for (var _iterator4 = houses[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+						var entity = _step4.value;
+
+						this.ctx.save();
+						this.ctx.translate(entity.pos.x - this.offset.x, entity.pos.y - this.offset.y);
+						this.ctx.drawImage(entity.image, -entity.image.width / 2, -entity.image.height / 2);
+
+						this.ctx.font = 'bold 25px arial';
+						this.ctx.textAlign = 'center';
+						this.ctx.textBaseline = 'middle';
+						if (entity.food > C.HOUSE_MAX_FOOD * .5) {
+							this.ctx.fillStyle = 'green';
+						} else if (entity.food > 0) {
+							this.ctx.fillStyle = 'yellow';
+						} else {
+							this.ctx.fillStyle = 'red';
+						}
+						this.ctx.fillText(entity.food, 0, 1);
+						this.ctx.restore();
+					}
+				} catch (err) {
+					_didIteratorError4 = true;
+					_iteratorError4 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion4 && _iterator4.return) {
+							_iterator4.return();
+						}
+					} finally {
+						if (_didIteratorError4) {
+							throw _iteratorError4;
+						}
+					}
+				}
+
 				if (controller.placingHouse) {
 					var absPos = { x: controller.mousePos.x + this.offset.x, y: controller.mousePos.y + this.offset.y };
 					if (map.atPixel(absPos) === undefined) {
 						this.renderImageAtTile(I.HOUSE, absPos);
+					}
+				}
+				if (controller.placingFarm) {
+					var absPos = { x: controller.mousePos.x + this.offset.x, y: controller.mousePos.y + this.offset.y };
+					if (map.atPixel(absPos) === undefined) {
+						this.renderImageAtTile(I.FARM_BARE, absPos);
 					}
 				}
 			}
@@ -645,7 +806,7 @@
 								ctx.fillStyle = '#008';
 								break;
 							case 'tree':
-								ctx.fillStyle = '#840';
+								ctx.fillStyle = '#040';
 								break;
 							default:
 								ctx.fillStyle = '#171';
@@ -685,6 +846,7 @@
 
 		this.draggingView = false;
 		this.placingHouse = false;
+		this.placingFarm = false;
 
 		this.mouseOut = false;
 		this.gameSpeed = 1;
@@ -695,6 +857,10 @@
 					if (_this.placingHouse) {
 						_this.placingHouse = false;
 						_this.map.placeHouse({ x: _this.mousePos.x + view.offset.x, y: _this.mousePos.y + view.offset.y });
+					}
+					if (_this.placingFarm) {
+						_this.placingFarm = false;
+						_this.map.placeFarm({ x: _this.mousePos.x + view.offset.x, y: _this.mousePos.y + view.offset.y });
 					}
 					break;
 				case 2:
@@ -752,10 +918,16 @@
 					_this.gameSpeed = 100;
 					break;
 
+				case 70:
+					_this.placingFarm = true;
+					_this.placingHouse = false;
+					break;
 				case 72:
 					_this.placingHouse = true;
+					_this.placingFarm = false;
 					break;
 				case 27:
+					_this.placingFarm = false;
 					_this.placingHouse = false;
 					break;
 			}
@@ -763,6 +935,63 @@
 	};
 
 	module.exports = Controller;
+
+/***/ },
+/* 10 */
+/***/ function(module, exports) {
+
+	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAEUwAABFMBAq/upQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABDSURBVDiNY1TkY/ivIcjIoCHEwPD+JxPD259MDFde/2YgRUxTiIHh7U8mhrc/mRmYGKgMRg0cNXDUwFEDRw0cKgYCAJ0hGpwOTaGAAAAAAElFTkSuQmCC"
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var I = __webpack_require__(4);
+
+	var Farm = (function () {
+		function Farm(map, pos) {
+			_classCallCheck(this, Farm);
+
+			this.map = map;
+			this.pos = pos;
+			this.image = I.FARM_UNPLANTED;
+			this.state = 'unplanted';
+			this.activeVillager = null;
+		}
+
+		_createClass(Farm, [{
+			key: 'plant',
+			value: function plant() {
+				this.state = 'planted';
+				this.image = I.FARM_BARE;
+				this.activeVillager = null;
+			}
+		}, {
+			key: 'update',
+			value: function update(delta) {}
+		}, {
+			key: 'tile',
+			get: function get() {
+				return { x: Math.floor(this.pos.x / this.map.tileWidth), y: Math.floor(this.pos.y / this.map.tileHeight) };
+			}
+		}]);
+
+		return Farm;
+	})();
+
+	module.exports = Farm;
+
+/***/ },
+/* 12 */
+/***/ function(module, exports) {
+
+	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAEUwAABFMBAq/upQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAAiSURBVDiNYzxbbfefgYqAiZqGjRo4auCogaMGjho4lAwEAHD/Aq3b5gigAAAAAElFTkSuQmCC"
 
 /***/ }
 /******/ ]);

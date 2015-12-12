@@ -2,7 +2,9 @@
 
 var C = require('./constants.js')
 var I = require('./image.js')
+var Farm = require('./farm.js')
 var House = require('./house.js')
+var Villager = require('./villager.js')
 
 class View{
 	constructor(canvas, ctx, map){
@@ -40,12 +42,34 @@ class View{
 
 	render(){
 		this.renderTiles()
+
+		var farms = []
+		var villagers = []
 		var houses = []
 		for(var entity of this.map.entities){
-			if(entity instanceof House){
+			if(entity instanceof Farm){
+				farms.push(entity)
+			}
+			else if(entity instanceof Villager){
+				villagers.push(entity)
+			}
+			else if(entity instanceof House){
 				houses.push(entity)
 				continue
 			}
+		}
+
+		for(var entity of farms){
+			this.ctx.save()
+			this.ctx.translate(
+				entity.pos.x - this.offset.x,
+				entity.pos.y - this.offset.y
+			)
+			this.ctx.drawImage(entity.image, -entity.image.width/2, -entity.image.height/2)
+			this.ctx.restore()
+		}
+
+		for(var entity of villagers){
 			this.ctx.save()
 			this.ctx.translate(
 				entity.pos.x - this.offset.x,
@@ -55,14 +79,15 @@ class View{
 			this.ctx.drawImage(entity.image, - entity.image.width/2, -entity.image.height/2)
 			this.ctx.restore()
 		}
+
 		for(var entity of houses){
 			this.ctx.save()
 			this.ctx.translate(
 				entity.pos.x - this.offset.x,
 				entity.pos.y - this.offset.y
 			)
-			this.ctx.rotate(entity.angle)
-			this.ctx.drawImage(entity.image, - entity.image.width/2, -entity.image.height/2)
+			this.ctx.drawImage(entity.image, -entity.image.width/2, -entity.image.height/2)
+
 			this.ctx.font = 'bold 25px arial'
 			this.ctx.textAlign = 'center'
 			this.ctx.textBaseline = 'middle'
@@ -81,6 +106,12 @@ class View{
 			var absPos = {x: controller.mousePos.x + this.offset.x, y: controller.mousePos.y + this.offset.y}
 			if(map.atPixel(absPos) === undefined){
 				this.renderImageAtTile(I.HOUSE, absPos)
+			}
+		}
+		if(controller.placingFarm){
+			var absPos = {x: controller.mousePos.x + this.offset.x, y: controller.mousePos.y + this.offset.y}
+			if(map.atPixel(absPos) === undefined){
+				this.renderImageAtTile(I.FARM_BARE, absPos)
 			}
 		}
 	}
@@ -105,7 +136,7 @@ class View{
 						ctx.fillStyle = '#008'
 						break
 					case 'tree':
-						ctx.fillStyle = '#840'
+						ctx.fillStyle = '#040'
 						break
 					default:
 						ctx.fillStyle = '#171'

@@ -1,6 +1,7 @@
 'use strict'
 
 var C = require('./constants.js')
+var Farm = require('./farm.js')
 var House = require('./house.js')
 var Villager = require('./villager.js')
 
@@ -42,6 +43,22 @@ class Map{
 				this.data[x][y] = 'water'
 			}
 		})
+	}
+
+	placeFarm(pos){
+		var farmPos = this.tileToPixel(this.pixelToTile(pos))
+		if(this.atPixel(farmPos) !== undefined){
+			return
+		}
+		for(var entity of this.entities){
+			if(entity instanceof Villager){
+				continue
+			}
+			if(entity.pos.x === farmPos.x && entity.pos.y === farmPos.y){
+				return
+			}
+		}
+		this.entities.push(new Farm(this, farmPos))
 	}
 
 	placeHouse(pos){

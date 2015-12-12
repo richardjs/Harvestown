@@ -2,7 +2,7 @@
 
 var C = require('./constants.js')
 var I = require('./image.js')
-
+var Farm = require('./farm.js')
 
 class Villager{
 	constructor(map, house){
@@ -18,6 +18,7 @@ class Villager{
 		this.image = I.VILLAGER
 
 		this.pixelTarget = null
+		this.activeFarm = null
 	}
 
 	get tile(){
@@ -90,13 +91,39 @@ class Villager{
 			}
 		}else{
 			// We've reacher our destination
+			if(this.activeFarm){
+				if(this.activeFarm.tile.x === this.tile.x && this.activeFarm.tile.y === this.tile.y){
+					if(this.activeFarm.state === 'unplanted'){
+						this.activeFarm.plant()
+						this.activeFarm = null
+					}
+				}
+			}
+
 			switch(this.state){
 				case 'idle':
-					var wanderRange = C.VILLAGER_WANDER_RANGE
-					this.goToTile({
-						x: Math.round(this.map.pixelToTile(this.house.pos).x + (Math.random()*2*wanderRange - wanderRange)),
-						y: Math.round(this.map.pixelToTile(this.house.pos).y + (Math.random()*2*wanderRange - wanderRange))
-					})
+					for(var entity of this.map.entities){
+						if(entity instanceof Farm){
+							if(entity.state === 'unplanted'){
+								if(entity.activeVillager){
+									continue
+								}
+								entity.activeVillager = this
+								this.activeFarm = entity
+								this.goToTile(entity.tile)
+								//this.state = 'planting'
+								return
+							}
+						}
+					}
+
+					if(this.state === 'idle'){
+						var wanderRange = C.VILLAGER_WANDER_RANGE
+						this.goToTile({
+							x: Math.round(this.map.pixelToTile(this.house.pos).x + (Math.random()*2*wanderRange - wanderRange)),
+							y: Math.round(this.map.pixelToTile(this.house.pos).y + (Math.random()*2*wanderRange - wanderRange))
+						})
+					}
 					break
 
 				case 'hungry':

@@ -7,6 +7,7 @@ class Controller{
 
 		this.draggingView = false
 		this.placingHouse = false
+		this.placingFarm = false
 
 		this.mouseOut = false
 		this.gameSpeed = 1
@@ -17,6 +18,10 @@ class Controller{
 					if(this.placingHouse){
 						this.placingHouse = false
 						this.map.placeHouse({x: this.mousePos.x + view.offset.x, y: this.mousePos.y + view.offset.y})
+					}
+					if(this.placingFarm){
+						this.placingFarm = false
+						this.map.placeFarm({x: this.mousePos.x + view.offset.x, y: this.mousePos.y + view.offset.y})
 					}
 					break
 				case 2:
@@ -74,10 +79,16 @@ class Controller{
 					this.gameSpeed = 100
 					break
 				
+				case 70:
+					this.placingFarm = true
+					this.placingHouse = false
+					break
 				case 72:
 					this.placingHouse = true
+					this.placingFarm = false
 					break
 				case 27:
+					this.placingFarm = false
 					this.placingHouse = false
 					break
 			}
