@@ -48,8 +48,12 @@ class Map{
 		})
 	}
 
+	in(pos){
+		return !(pos.x < 0 || pos.x >= this.width || pos.y < 0 || pos.y >= this.height)
+	}
+
 	at(pos){
-		if(pos.x < 0 || pos.x >= this.width || pos.y < 0 || pos.y >= this.height){
+		if(!this.in(pos)){
 			return 'water'
 		}
 		return this.data[pos.x][pos.y]

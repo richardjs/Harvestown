@@ -18,6 +18,9 @@ class Villager{
 
 	goToTile(pos){
 		this.path = []
+		if(map.at(pos) === 'water'){
+			return
+		}
 		var dijkstra = new ROT.Path.Dijkstra(pos.x, pos.y, (x, y) => {
 			return this.map.at({x: x, y: y}) !== 'water'
 		})
@@ -70,6 +73,12 @@ class Villager{
 			if(this.pos.x === this.pixelTarget.x && this.pos.y === this.pixelTarget.y){
 				this.nextPathNode()
 			}
+		}else{
+			var wanderRange = 5
+			this.goToTile({
+				x: Math.round(this.tile.x + (Math.random()*2*wanderRange - wanderRange)),
+				y: Math.round(this.tile.y + (Math.random()*2*wanderRange - wanderRange))
+			})
 		}
 	}
 }

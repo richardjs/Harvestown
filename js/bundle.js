@@ -179,9 +179,14 @@
 				});
 			}
 		}, {
+			key: 'in',
+			value: function _in(pos) {
+				return !(pos.x < 0 || pos.x >= this.width || pos.y < 0 || pos.y >= this.height);
+			}
+		}, {
 			key: 'at',
 			value: function at(pos) {
-				if (pos.x < 0 || pos.x >= this.width || pos.y < 0 || pos.y >= this.height) {
+				if (!this.in(pos)) {
 					return 'water';
 				}
 				return this.data[pos.x][pos.y];
@@ -228,6 +233,9 @@
 				var _this = this;
 
 				this.path = [];
+				if (map.at(pos) === 'water') {
+					return;
+				}
 				var dijkstra = new ROT.Path.Dijkstra(pos.x, pos.y, function (x, y) {
 					return _this.map.at({ x: x, y: y }) !== 'water';
 				});
@@ -281,6 +289,12 @@
 					if (this.pos.x === this.pixelTarget.x && this.pos.y === this.pixelTarget.y) {
 						this.nextPathNode();
 					}
+				} else {
+					var wanderRange = 5;
+					this.goToTile({
+						x: Math.round(this.tile.x + (Math.random() * 2 * wanderRange - wanderRange)),
+						y: Math.round(this.tile.y + (Math.random() * 2 * wanderRange - wanderRange))
+					});
 				}
 			}
 		}, {
