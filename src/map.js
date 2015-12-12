@@ -85,7 +85,7 @@ class Map{
 
 	at(pos){
 		if(!this.in(pos)){
-			return 'water'
+			return 'out'
 		}
 		return this.data[pos.x][pos.y]
 	}

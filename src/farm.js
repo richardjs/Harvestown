@@ -12,15 +12,29 @@ class Farm{
 		this.activeVillager = null
 		
 		this.growthTimer = 0
+		this.growthTime = C.FARM_GROWTH_TIME - this.countWaterNeighbors()*C.FARM_WATER_REDUCTION
 	}
 
 	get tile(){
 		return {x: Math.floor(this.pos.x / this.map.tileWidth), y: Math.floor(this.pos.y / this.map.tileHeight)}
 	}
+
+	countWaterNeighbors(){
+		var count = 0
+		if(map.at({x: this.tile.x - 1, y: this.tile.y}) === 'water') count++
+		if(map.at({x: this.tile.x + 1, y: this.tile.y}) === 'water') count++
+		if(map.at({x: this.tile.x, y: this.tile.y - 1}) === 'water') count++
+		if(map.at({x: this.tile.x, y: this.tile.y + 1}) === 'water') count++
+		if(map.at({x: this.tile.x - 1, y: this.tile.y - 1}) === 'water') count++
+		if(map.at({x: this.tile.x - 1, y: this.tile.y + 1}) === 'water') count++
+		if(map.at({x: this.tile.x + 1, y: this.tile.y - 1}) === 'water') count++
+		if(map.at({x: this.tile.x + 1, y: this.tile.y + 1}) === 'water') count++
+		return count
+	}
 	
 	plant(){
 		this.state = 'planted'
-		this.growthTimer = C.FARM_GROWTH_TIME
+		this.growthTimer = this.growthTime
 		this.image = I.FARM_BARE
 		this.activeVillager = null
 	}
@@ -39,10 +53,10 @@ class Farm{
 			}
 		}
 
-		if(this.growthTimer < C.FARM_GROWTH_TIME*.66){
+		if(this.growthTimer < this.growthTime*.66){
 			this.image = I.FARM_SPROUTS
 		}
-		if(this.growthTimer < C.FARM_GROWTH_TIME*.33){
+		if(this.growthTimer < this.growthTime*.33){
 			this.image = I.FARM_GROWING
 		}
 	}

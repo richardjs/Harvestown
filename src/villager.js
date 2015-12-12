@@ -27,11 +27,12 @@ class Villager{
 
 	goToTile(pos){
 		this.path = []
-		if(map.at(pos) === 'water'){
+		if(this.map.at(pos) !== undefined){
 			return
 		}
 		var dijkstra = new ROT.Path.Dijkstra(pos.x, pos.y, (x, y) => {
-			return this.map.at({x: x, y: y}) !== 'water'
+			var at = this.map.at({x: x, y: y})
+			return at === undefined
 		})
 		dijkstra.compute(this.tile.x, this.tile.y, (x, y) => {
 			this.path.push({x: x, y: y})

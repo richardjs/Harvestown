@@ -137,7 +137,8 @@
 	exports.VILLAGER_HUNGER_TIME = 60 * 1000;
 
 	//Farm parameters
-	exports.FARM_GROWTH_TIME = 10 * 1000;
+	exports.FARM_GROWTH_TIME = 60 * 3.5 * 1000;
+	exports.FARM_WATER_REDUCTION = exports.FARM_GROWTH_TIME * .1;
 
 	// House parameters
 	exports.HOUSE_STARTING_FOOD = 3;
@@ -301,7 +302,7 @@
 			key: 'at',
 			value: function at(pos) {
 				if (!this.in(pos)) {
-					return 'water';
+					return 'out';
 				}
 				return this.data[pos.x][pos.y];
 			}
@@ -446,11 +447,12 @@
 				var _this = this;
 
 				this.path = [];
-				if (map.at(pos) === 'water') {
+				if (this.map.at(pos) !== undefined) {
 					return;
 				}
 				var dijkstra = new ROT.Path.Dijkstra(pos.x, pos.y, function (x, y) {
-					return _this.map.at({ x: x, y: y }) !== 'water';
+					var at = _this.map.at({ x: x, y: y });
+					return at === undefined;
 				});
 				dijkstra.compute(this.tile.x, this.tile.y, function (x, y) {
 					_this.path.push({ x: x, y: y });
@@ -975,13 +977,28 @@
 			this.activeVillager = null;
 
 			this.growthTimer = 0;
+			this.growthTime = C.FARM_GROWTH_TIME - this.countWaterNeighbors() * C.FARM_WATER_REDUCTION;
 		}
 
 		_createClass(Farm, [{
+			key: 'countWaterNeighbors',
+			value: function countWaterNeighbors() {
+				var count = 0;
+				if (map.at({ x: this.tile.x - 1, y: this.tile.y }) === 'water') count++;
+				if (map.at({ x: this.tile.x + 1, y: this.tile.y }) === 'water') count++;
+				if (map.at({ x: this.tile.x, y: this.tile.y - 1 }) === 'water') count++;
+				if (map.at({ x: this.tile.x, y: this.tile.y + 1 }) === 'water') count++;
+				if (map.at({ x: this.tile.x - 1, y: this.tile.y - 1 }) === 'water') count++;
+				if (map.at({ x: this.tile.x - 1, y: this.tile.y + 1 }) === 'water') count++;
+				if (map.at({ x: this.tile.x + 1, y: this.tile.y - 1 }) === 'water') count++;
+				if (map.at({ x: this.tile.x + 1, y: this.tile.y + 1 }) === 'water') count++;
+				return count;
+			}
+		}, {
 			key: 'plant',
 			value: function plant() {
 				this.state = 'planted';
-				this.growthTimer = C.FARM_GROWTH_TIME;
+				this.growthTimer = this.growthTime;
 				this.image = I.FARM_BARE;
 				this.activeVillager = null;
 			}
@@ -1001,10 +1018,10 @@
 					}
 				}
 
-				if (this.growthTimer < C.FARM_GROWTH_TIME * .66) {
+				if (this.growthTimer < this.growthTime * .66) {
 					this.image = I.FARM_SPROUTS;
 				}
-				if (this.growthTimer < C.FARM_GROWTH_TIME * .33) {
+				if (this.growthTimer < this.growthTime * .33) {
 					this.image = I.FARM_GROWING;
 				}
 			}

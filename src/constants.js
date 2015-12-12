@@ -14,7 +14,8 @@ exports.VILLAGER_WANDER_RANGE = 10
 exports.VILLAGER_HUNGER_TIME = 60*1000
 
 //Farm parameters
-exports.FARM_GROWTH_TIME = 10*1000
+exports.FARM_GROWTH_TIME = 60*3.5*1000
+exports.FARM_WATER_REDUCTION = exports.FARM_GROWTH_TIME*.1
 
 // House parameters
 exports.HOUSE_STARTING_FOOD = 3
