@@ -8,9 +8,11 @@ var TREE_CELL_RANDOM_START_CHANCE = .43
 var TREE_GENERATIONS = 100
 
 class Map{
-	constructor(width, height){
+	constructor(width, height, tileWidth, tileHeight){
 		this.width = width
 		this.height = height
+		this.tileWidth = tileWidth
+		this.tileHeight = tileHeight
 
 		this.data = []
 		for(var i = 0; i < width; i++){
@@ -19,7 +21,7 @@ class Map{
 		this.generateGeography()
 
 		this.entities = []
-		this.entities.push(new Villager({x: 50, y: 50}))
+		this.entities.push(new Villager(this, {x: 50, y: 50}))
 	}
 
 	generateGeography(){
@@ -44,6 +46,17 @@ class Map{
 				this.data[x][y] = 'water'
 			}
 		})
+	}
+
+	at(pos){
+		if(pos.x < 0 || pos.x >= this.width || pos.y < 0 || pos.y >= this.height){
+			return 'water'
+		}
+		return this.data[pos.x][pos.y]
+	}
+
+	atPixel(pos){
+		return this.data[Math.floor(pos.x / this.tileWidth)][Math.floor(pos.y / this.tileHeight)]
 	}
 }
 

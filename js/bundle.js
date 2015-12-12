@@ -49,8 +49,11 @@
 	var MAP_WIDTH = 100;
 	var MAP_HEIGHT = 100;
 
+	var TILE_WIDTH = 20;
+	var TILE_HEIGHT = 20;
+
 	var Map = __webpack_require__(1);
-	var View = __webpack_require__(4);
+	var View = __webpack_require__(3);
 	var Controller = __webpack_require__(5);
 
 	var canvas = document.createElement('canvas');
@@ -64,9 +67,9 @@
 		canvas.height = window.innerHeight;
 	});
 
-	var map = new Map(MAP_WIDTH, MAP_HEIGHT);
+	global.map = new Map(MAP_WIDTH, MAP_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
 	global.view = new View(canvas, ctx, map);
-	var controller = new Controller();
+	global.controller = new Controller();
 
 	var lastTime = null;
 	function frame(time) {
@@ -105,11 +108,13 @@
 	var TREE_GENERATIONS = 100;
 
 	var Map = (function () {
-		function Map(width, height) {
+		function Map(width, height, tileWidth, tileHeight) {
 			_classCallCheck(this, Map);
 
 			this.width = width;
 			this.height = height;
+			this.tileWidth = tileWidth;
+			this.tileHeight = tileHeight;
 
 			this.data = [];
 			for (var i = 0; i < width; i++) {
@@ -118,7 +123,7 @@
 			this.generateGeography();
 
 			this.entities = [];
-			this.entities.push(new Villager({ x: 50, y: 50 }));
+			this.entities.push(new Villager(this, { x: 50, y: 50 }));
 		}
 
 		_createClass(Map, [{
@@ -148,6 +153,19 @@
 					}
 				});
 			}
+		}, {
+			key: 'at',
+			value: function at(pos) {
+				if (pos.x < 0 || pos.x >= this.width || pos.y < 0 || pos.y >= this.height) {
+					return 'water';
+				}
+				return this.data[pos.x][pos.y];
+			}
+		}, {
+			key: 'atPixel',
+			value: function atPixel(pos) {
+				return this.data[Math.floor(pos.x / this.tileWidth)][Math.floor(pos.y / this.tileHeight)];
+			}
 		}]);
 
 		return Map;
@@ -161,24 +179,45 @@
 
 	'use strict';
 
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Villager = function Villager(pos) {
-		_classCallCheck(this, Villager);
+	var Villager = (function () {
+		function Villager(map, pos) {
+			_classCallCheck(this, Villager);
 
-		this.pos = pos;
-	};
+			this.map = map;
+			this.pos = pos;
+			this.path = [];
+		}
+
+		_createClass(Villager, [{
+			key: 'goToTile',
+			value: function goToTile(pos) {
+				var _this = this;
+
+				var dijkstra = new ROT.Path.Dijkstra(pos.x, pos.y, function (x, y) {
+					return _this.map.at({ x: x, y: y }) !== 'water';
+				});
+				dijkstra.compute(this.tile.x, this.tile.y, function (x, y) {
+					_this.path.push({ x: x, y: y });
+				});
+			}
+		}, {
+			key: 'tile',
+			get: function get() {
+				return { x: Math.floor(this.pos.x / this.map.tileWidth), y: Math.floor(this.pos.y / this.map.tileHeight) };
+			}
+		}]);
+
+		return Villager;
+	})();
 
 	module.exports = Villager;
 
 /***/ },
 /* 3 */
-/***/ function(module, exports) {
-
-	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAaCAYAAAD1wA/qAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAFiQAABYkBbWid+gAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAASESURBVFiFtZhbbBRlFMd/Z3Zmy25LC3W3tFuwhUSqRhq8YKhA3BcvJAY2RiQkElvAS2KMsTH6ZIpBH0wUw0NNMBIl0YhAUghBy4uiqVCjIJQAlSZAsXTthYUu23Znd2c+HwBpYK/t9Pc0M9/5zvmfmfOd+WZgGglVVgZDlZXBTOdOok+H0/+xrJabR4fTnjuI3DpQu98uT1rSouBJhI/ca7fuFUHl62i13/8hmnbYbRjHU6YZskU2CCwDEJG4giGUmgegRFbtHxg4UKhYtf1VI1Fa0gxqoxKttWh85nZp2hwHEKWQ5PfN623FJwL+CSmeArbkm9DqqqpnxLLaAQtwZVekUkrTWtyG8dmevr7xfJIY/+6doIb9OfDAhMv/KJFPi8ZnbhdzV/PHKN7N5ECgyb1u69fZgqzy+QKayD5EluQjKg2b9w0OfpBp0NzVvAbF7iwaW3Wl1Cy5XWFprMSdTcHz5eVzlaZ1KqjOR3EaoinL+jKbgSCzVZaisFGGNsngAKyZO9dj6/r+KSQBUKq7XD811tbOmIqWvLtWPcGHijGfKyVZs5bjsSuG8diZ0bElVw29eCoCbrIwfj0W3TLD82d13PxtL4u9ETyXw8w63MvBI/k4yJhIYsyk/8RFzrWfWLcD7Y0vxFrUyQKpJQIKzhZ7uWo4173jLs0YcekN1ZgNF6ScbuZQxjg7lNZ16P1dkYXPLiawuBa3tyh3IrZlc6mzh4tHuvn31CWspAUQFLhrFZVbKSIYjiUCMNNK3XVNoH6oJ8xQTxiX4aKqvoaahjruXXofmuv2ytABlFJc7Oima28nscGRvILGtOwddjL0ejzMi5sZx62kRd+x8/QdO8/JPUepf2EptcvqQECPR+PG0dYfCXddKijodd35RCKGTsfsMrxjMUjMyWobG7jGkdZ2LnScZcWbK3W9Y9vB5YNn+goOOq5NqeFlJGIYePVRSORnHz7Zy6/bfliuXekJ1xYSqNiIcXRWGbZkefdMgbrRMYbHsj+NOxnqvjxfs5L2H9OiaBK4laJudKzgeVbS/l2zsDYBA/lOGk2W0HBthHsSyYID5mIyPgXCCmuT9gqcVdiPCHwL2Pk6mBePFxw0F5Vm5o6VBhv4JoH96Eb4WwPYCP1N2C9p2PXATiCay0tVIomovHf5ORGlqDTzWuFRYCfYizZgr38NwnDHC7ERToPd+BW8buNaKaiQwAoF8+/0NqK7UA4ueCXCiKHjS19e54EOQdrAam+Cu8oh7R7jhqHVBrQB7ICApqz3FsjwUyUkvMD1c17Pg4CjPfic12P7EsnTxSSKa4gkiyTVlVT2W7fuejYmfUt3gysGgctFRYv+KivbaYNvMn40pYYfjkZfrjbNUyXQ/+KND7OCcaQ2Vvl8AU3T2oDHC51r6XrNgf7+wrYVaXCsyEOBwNOkUocUWJLrUxdS3CzrfYODjmhwrsZTqSfEtoMp0/SjVBPQMXFYwbBAmyjVSCLhF9sOIvKLY/Gnk5Df/3OookKFKipacltPDee3sBO4v7S0F6V6s/1YcIr/AFQrspV27UJwAAAAAElFTkSuQmCC"
-
-/***/ },
-/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -187,11 +226,8 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var TILE_WIDTH = 20;
-	var TILE_HEIGHT = 20;
-
 	var VILLAGER_IMAGE = document.createElement('img');
-	VILLAGER_IMAGE.src = __webpack_require__(3);
+	VILLAGER_IMAGE.src = __webpack_require__(4);
 
 	var View = (function () {
 		function View(canvas, ctx, map) {
@@ -209,14 +245,14 @@
 				this.offset.x += vector.x;
 				if (this.offset.x < 0) {
 					this.offset.x = 0;
-				} else if (this.offset.x + this.canvas.width >= this.map.width * TILE_WIDTH) {
-					this.offset.x = this.map.width * TILE_WIDTH - this.canvas.width - 2;
+				} else if (this.offset.x + this.canvas.width >= this.map.width * this.map.tileWidth) {
+					this.offset.x = this.map.width * this.map.tileWidth - this.canvas.width - 2;
 				}
 				this.offset.y += vector.y;
 				if (this.offset.y < 0) {
 					this.offset.y = 0;
-				} else if (this.offset.y + this.canvas.height >= this.map.height * TILE_HEIGHT) {
-					this.offset.y = this.map.height * TILE_HEIGHT - this.canvas.height - 2;
+				} else if (this.offset.y + this.canvas.height >= this.map.height * this.map.tileHeight) {
+					this.offset.y = this.map.height * this.map.tileHeight - this.canvas.height - 2;
 				}
 			}
 		}, {
@@ -231,7 +267,7 @@
 					for (var _iterator = this.map.entities[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 						var entity = _step.value;
 
-						this.ctx.drawImage(VILLAGER_IMAGE, entity.pos.x - this.offset.x, entity.pos.y - this.offset.y, 20, 20 / VILLAGER_IMAGE.width * VILLAGER_IMAGE.height);
+						this.ctx.drawImage(VILLAGER_IMAGE, entity.pos.x - this.offset.x - VILLAGER_IMAGE.width / 2, entity.pos.y - this.offset.y - VILLAGER_IMAGE.height / 2);
 					}
 				} catch (err) {
 					_didIteratorError = true;
@@ -252,12 +288,12 @@
 			key: 'renderTiles',
 			value: function renderTiles() {
 				var tileOffset = {
-					x: Math.floor(this.offset.x / TILE_WIDTH),
-					y: Math.floor(this.offset.y / TILE_HEIGHT)
+					x: Math.floor(this.offset.x / this.map.tileWidth),
+					y: Math.floor(this.offset.y / this.map.tileHeight)
 				};
 				var subTileOffset = {
-					x: this.offset.x % TILE_WIDTH,
-					y: this.offset.y % TILE_HEIGHT
+					x: this.offset.x % this.map.tileWidth,
+					y: this.offset.y % this.map.tileHeight
 				};
 				for (var x = 0; x < this.map.width; x++) {
 					for (var y = 0; y < this.map.height; y++) {
@@ -274,7 +310,8 @@
 							default:
 								this.ctx.fillStyle = '#171';
 						}
-						this.ctx.fillRect(x * TILE_WIDTH - subTileOffset.x, y * TILE_HEIGHT - subTileOffset.y, TILE_WIDTH, TILE_HEIGHT);
+						this.ctx.fillRect(x * this.map.tileWidth - subTileOffset.x, y * this.map.tileHeight - subTileOffset.y, this.map.tileWidth, this.map.tileHeight);
+						this.ctx.strokeRect(x * this.map.tileWidth - subTileOffset.x, y * this.map.tileHeight - subTileOffset.y, this.map.tileWidth, this.map.tileHeight);
 					}
 				}
 			}
@@ -284,6 +321,12 @@
 	})();
 
 	module.exports = View;
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAKCAYAAABWiWWfAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAACIQAAAiEBPhEQkwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAHHSURBVCiRfZE7aFNxGMV/3z83N72SBiK9SWhpi60PpIOQJZZCtZaugs+xdHByExHXdNBBiziLkMkH4gMdFEE7VHRRIro0KKa+KDZpUyOhvU2893OxGqXp2T445wfnOwJQu3UmFT1+8RtN2g+WOzBgvMXFtIFREwRb3HI5ewUazT7NZk2tr9bRPj5VkrUbp86BnFXleeOnOdY+PlUCOJhIJA3kgc71oMAnVCfvlcs5AL1+uqMuPABNA5cMao4AIRGGI+GgK0Mmdt5xhizVN80gAIVeA5cno9GRDJlYQ7QbdBCIoHLYAqh8LDE3M0t++v3NORnZ8dUuSCDCRvJFYlWY/iwJvTBxrXhgtJu+4d3EexJYL3NP3XdP3oKCYu8UgVagdX1xHBzPE9bq/YWHeQqP8uwa2+Oa4rOCj/412qbOkhXeFBbxAzy/7Z/+xZnZhgk8b1DQO/xeqR7YbF9Z2RTW63nNZwP0tu95Q9YEfAA9ehXd6tG2r0e/nzRoLKSa9kWs/0EhVV/QV11a/VHFyaVYfnwCKgAtn3MomUyo6muFTvlThlW1rLH78/MvNsqYVrDlhYVK2HW3IbIXuCsiqbDrxuO2nW+V+QVhkqzcQPxdCwAAAABJRU5ErkJggg=="
 
 /***/ },
 /* 5 */
