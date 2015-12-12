@@ -11,6 +11,10 @@ class Villager{
 		this.pos = {x: house.pos.x, y: house.pos.y}
 		this.angle = 0
 		this.path = []
+
+		this.state = 'idle'
+		this.hungerTimer = C.VILLAGER_HUNGER_TIME
+
 		this.image = I.VILLAGER
 
 		this.pixelTarget = null
@@ -59,7 +63,15 @@ class Villager{
 	}
 
 	update(delta){
+		if(this.hungerTimer > 0){
+			this.hungerTimer -= delta
+		}else{
+			this.state = 'hungry'
+			console.log('I\'m hungry')
+		}
+
 		if(this.pixelTarget){
+			// We're going somewhere
 			var dx = Math.cos(this.angle) * C.VILLAGER_SPEED * delta/1000
 			var dy = Math.sin(this.angle) * C.VILLAGER_SPEED * delta/1000
 
@@ -78,11 +90,25 @@ class Villager{
 				this.nextPathNode()
 			}
 		}else{
-			var wanderRange = 5
-			this.goToTile({
-				x: Math.round(this.map.pixelToTile(this.house.pos).x + (Math.random()*2*wanderRange - wanderRange)),
-				y: Math.round(this.map.pixelToTile(this.house.pos).y + (Math.random()*2*wanderRange - wanderRange))
-			})
+			// We've reacher our destination
+			switch(this.state){
+				case 'idle':
+					var wanderRange = C.VILLAGER_WANDER_RANGE
+					this.goToTile({
+						x: Math.round(this.map.pixelToTile(this.house.pos).x + (Math.random()*2*wanderRange - wanderRange)),
+						y: Math.round(this.map.pixelToTile(this.house.pos).y + (Math.random()*2*wanderRange - wanderRange))
+					})
+					break
+
+				case 'hungry':
+					if(this.tile.x === this.house.tile.x && this.tile.y === this.house.tile.y){
+						this.state = 'idle'
+						this.hungerTimer = C.VILLAGER_HUNGER_TIME
+						console.log('burp')
+					}else{
+						this.goToTile(this.house.tile)
+					}
+			}
 		}
 	}
 }
