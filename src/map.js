@@ -1,6 +1,7 @@
 'use strict'
 
 var C = require('./constants.js')
+var House = require('./house.js')
 var Villager = require('./villager.js')
 
 class Map{
@@ -13,7 +14,8 @@ class Map{
 		this.generateGeography()
 
 		this.entities = []
-		this.entities.push(new Villager(this, {x: 50, y: 50}))
+		this.entities.push(new House(this, {x: 50, y: 50}))
+		this.entities.push(new House(this, {x: 70, y: 50}))
 	}
 
 	generateGeography(){

@@ -15,7 +15,10 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="villager.svg">
+   sodipodi:docname="villager.svg"
+   inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager.png"
+   inkscape:export-xdpi="13.846154"
+   inkscape:export-ydpi="13.846154">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -27,7 +30,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="3.959798"
      inkscape:cx="360.66989"
-     inkscape:cy="431.11732"
+     inkscape:cy="461.4219"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -61,42 +64,63 @@
        inkscape:connector-curvature="0"
        id="path4150"
        d="m 409,617.3622 0,-24.28571 9.28571,-5.71429 10.71429,5.35714 0,24.64286 z"
-       style="fill:#f9a772;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1" />
+       style="fill:#f9a772;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\player.png"
+       inkscape:export-xdpi="36"
+       inkscape:export-ydpi="36" />
     <path
        style="fill:#f9a772;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
        d="m 306,617.3622 0,-24.28571 9.28571,-5.71429 10.71429,5.35714 0,24.64286 z"
        id="path4148"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cccccc" />
+       sodipodi:nodetypes="cccccc"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\player.png"
+       inkscape:export-xdpi="36"
+       inkscape:export-ydpi="36" />
     <ellipse
        style="fill:#9e0002;fill-opacity:1"
        id="path4142"
        cx="367.5"
        cy="616.47821"
        rx="62.5"
-       ry="17.51115" />
+       ry="17.51115"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\player.png"
+       inkscape:export-xdpi="36"
+       inkscape:export-ydpi="36" />
     <path
        style="fill:#01015b;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 337,631.96173 0,-30.73595 -6.13642,0.75761 0,29.11612 z"
        id="path4152"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccc" />
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\player.png"
+       inkscape:export-xdpi="36"
+       inkscape:export-ydpi="36" />
     <circle
        style="fill:#501616;fill-opacity:1"
        id="path4140"
        cx="367.5"
        cy="614.86218"
-       r="27.5" />
+       r="27.5"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\player.png"
+       inkscape:export-xdpi="36"
+       inkscape:export-ydpi="36" />
     <path
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="path4154"
        d="m 398.12627,631.96173 0,-30.73595 6.6415,0.75761 0,29.11612 z"
-       style="fill:#01015b;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       style="fill:#01015b;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\player.png"
+       inkscape:export-xdpi="36"
+       inkscape:export-ydpi="36" />
     <path
        style="fill:#501616;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 370,592.3622 5,-10 5,10 10,0 -5,5 10,5 -5,5 10,5 -10,10 5,10 -10,0 0,10 -10,-5 -10,10 -5,-10 -10,5 5,-10 -15,0 5,-10 -10,-5 10,-5 -5,-10 15,-5 -5,-10 10,5 5,-10 z"
        id="path4144"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\player.png"
+       inkscape:export-xdpi="36"
+       inkscape:export-ydpi="36" />
   </g>
 </svg>

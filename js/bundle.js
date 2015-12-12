@@ -127,6 +127,7 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var C = __webpack_require__(6);
+	var House = __webpack_require__(7);
 	var Villager = __webpack_require__(2);
 
 	var Map = (function () {
@@ -141,7 +142,8 @@
 			this.generateGeography();
 
 			this.entities = [];
-			this.entities.push(new Villager(this, { x: 50, y: 50 }));
+			this.entities.push(new House(this, { x: 50, y: 50 }));
+			this.entities.push(new House(this, { x: 70, y: 50 }));
 		}
 
 		_createClass(Map, [{
@@ -212,6 +214,9 @@
 
 	var C = __webpack_require__(6);
 
+	var VILLAGER_IMAGE = new Image();
+	VILLAGER_IMAGE.src = __webpack_require__(4);
+
 	var Villager = (function () {
 		function Villager(map, pos) {
 			_classCallCheck(this, Villager);
@@ -220,6 +225,7 @@
 			this.pos = pos;
 			this.angle = 0;
 			this.path = [];
+			this.image = VILLAGER_IMAGE;
 
 			this.pixelTarget = null;
 		}
@@ -316,8 +322,7 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var VILLAGER_IMAGE = document.createElement('img');
-	VILLAGER_IMAGE.src = __webpack_require__(4);
+	var House = __webpack_require__(7);
 
 	var View = (function () {
 		function View(canvas, ctx, map) {
@@ -351,6 +356,7 @@
 			key: 'render',
 			value: function render() {
 				this.renderTiles();
+				var houses = [];
 				var _iteratorNormalCompletion = true;
 				var _didIteratorError = false;
 				var _iteratorError = undefined;
@@ -359,10 +365,14 @@
 					for (var _iterator = this.map.entities[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 						var entity = _step.value;
 
+						if (entity instanceof House) {
+							houses.push(entity);
+							continue;
+						}
 						this.ctx.save();
 						this.ctx.translate(entity.pos.x - this.offset.x, entity.pos.y - this.offset.y);
 						this.ctx.rotate(entity.angle);
-						this.ctx.drawImage(VILLAGER_IMAGE, -VILLAGER_IMAGE.width / 2, -VILLAGER_IMAGE.height / 2);
+						this.ctx.drawImage(entity.image, -entity.image.width / 2, -entity.image.height / 2);
 						this.ctx.restore();
 					}
 				} catch (err) {
@@ -376,6 +386,35 @@
 					} finally {
 						if (_didIteratorError) {
 							throw _iteratorError;
+						}
+					}
+				}
+
+				var _iteratorNormalCompletion2 = true;
+				var _didIteratorError2 = false;
+				var _iteratorError2 = undefined;
+
+				try {
+					for (var _iterator2 = houses[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+						var entity = _step2.value;
+
+						this.ctx.save();
+						this.ctx.translate(entity.pos.x - this.offset.x, entity.pos.y - this.offset.y);
+						this.ctx.rotate(entity.angle);
+						this.ctx.drawImage(entity.image, -entity.image.width / 2, -entity.image.height / 2);
+						this.ctx.restore();
+					}
+				} catch (err) {
+					_didIteratorError2 = true;
+					_iteratorError2 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion2 && _iterator2.return) {
+							_iterator2.return();
+						}
+					} finally {
+						if (_didIteratorError2) {
+							throw _iteratorError2;
 						}
 					}
 				}
@@ -538,6 +577,48 @@
 
 	// Technical engine parameters
 	exports.MAX_FRAME_DELTA = 100;
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Villager = __webpack_require__(2);
+
+	var HOUSE_IMAGE = new Image();
+	HOUSE_IMAGE.src = __webpack_require__(8);
+
+	var House = (function () {
+		function House(map, pos) {
+			_classCallCheck(this, House);
+
+			this.map = map;
+			this.pos = pos;
+			this.image = HOUSE_IMAGE;
+
+			this.map.entities.push(new Villager(this.map, { x: pos.x, y: pos.y }));
+		}
+
+		_createClass(House, [{
+			key: 'update',
+			value: function update() {}
+		}]);
+
+		return House;
+	})();
+
+	module.exports = House;
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAZCAYAAAArK+5dAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAFZQAABWUB/iX64wAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAFuSURBVEiJ7ZTLTsJAFIb/mU6HTgVsAWOoRoO3gJelcWN8HV/Eh1O3RgzeEhUkEi4FhLbMMHVrIhpZqCHx35/vy59zcgg+hrtzvDifMEpzCdOLY72VsgyHEeJ1ArVxWHC0I8z7SOlqvRf5oPFtsyerlWZ0XfMHZQDyPYztLCZPktzIh2O9mbKYaxrwlEYma5sAAD9QcAQDAGgNVcjaLJ/mywCQaTOsZgQAoNIYQJhGK5DjWq0b+o5gN8+96InlUuaxK8zce5AfqAnFvo7FKFZcKwsgazGK1Yw4mm8FVTo1aZrEID8rAPAv+FsBIbO+5BjxjDcAZn0H/6/i7wVk9q+IkF9ooMbxj8EDqQm7rPv7aZHYtRjfex2pPDfoWqh0McHokjCp9R1QeyDVc2/UGkh9HSh11+iPamdP3fJtU56Sz4ZsG96C4Ac25dtJm+U5idc7oSodFlydFuxqKMf3VT986fTlxWNjdP4wHNYncd4AEvqPtXQfPg8AAAAASUVORK5CYII="
 
 /***/ }
 /******/ ]);

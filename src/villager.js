@@ -2,12 +2,16 @@
 
 var C = require('./constants.js')
 
+var VILLAGER_IMAGE = new Image()
+VILLAGER_IMAGE.src = require('../img/villager.png')
+
 class Villager{
 	constructor(map, pos){
 		this.map = map
 		this.pos = pos
 		this.angle = 0
 		this.path = []
+		this.image = VILLAGER_IMAGE
 
 		this.pixelTarget = null
 	}

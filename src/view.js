@@ -1,7 +1,6 @@
 'use strict'
 
-var VILLAGER_IMAGE = document.createElement('img')
-VILLAGER_IMAGE.src = require('../img/villager.png')
+var House = require('./house.js')
 
 class View{
 	constructor(canvas, ctx, map){
@@ -30,14 +29,29 @@ class View{
 
 	render(){
 		this.renderTiles()
+		var houses = []
 		for(var entity of this.map.entities){
+			if(entity instanceof House){
+				houses.push(entity)
+				continue
+			}
 			this.ctx.save()
 			this.ctx.translate(
 				entity.pos.x - this.offset.x,
 				entity.pos.y - this.offset.y
 			)
 			this.ctx.rotate(entity.angle)
-			this.ctx.drawImage(VILLAGER_IMAGE, - VILLAGER_IMAGE.width/2, -VILLAGER_IMAGE.height/2)
+			this.ctx.drawImage(entity.image, - entity.image.width/2, -entity.image.height/2)
+			this.ctx.restore()
+		}
+		for(var entity of houses){
+			this.ctx.save()
+			this.ctx.translate(
+				entity.pos.x - this.offset.x,
+				entity.pos.y - this.offset.y
+			)
+			this.ctx.rotate(entity.angle)
+			this.ctx.drawImage(entity.image, - entity.image.width/2, -entity.image.height/2)
 			this.ctx.restore()
 		}
 	}
