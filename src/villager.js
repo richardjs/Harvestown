@@ -1,9 +1,8 @@
 'use strict'
 
 var C = require('./constants.js')
+var I = require('./image.js')
 
-var VILLAGER_IMAGE = new Image()
-VILLAGER_IMAGE.src = require('../img/villager.png')
 
 class Villager{
 	constructor(map, pos){
@@ -11,7 +10,7 @@ class Villager{
 		this.pos = pos
 		this.angle = 0
 		this.path = []
-		this.image = VILLAGER_IMAGE
+		this.image = I.VILLAGER
 
 		this.pixelTarget = null
 	}

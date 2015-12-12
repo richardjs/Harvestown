@@ -64,7 +64,7 @@
 
 	global.map = new Map(C.MAP_WIDTH, C.MAP_HEIGHT, C.TILE_WIDTH, C.TILE_HEIGHT);
 	global.view = new View(canvas, ctx, map);
-	global.controller = new Controller();
+	global.controller = new Controller(map);
 
 	var lastTime = null;
 	function frame(time) {
@@ -142,8 +142,6 @@
 			this.generateGeography();
 
 			this.entities = [];
-			this.entities.push(new House(this, { x: 50, y: 50 }));
-			this.entities.push(new House(this, { x: 70, y: 50 }));
 		}
 
 		_createClass(Map, [{
@@ -178,6 +176,42 @@
 				});
 			}
 		}, {
+			key: 'placeHouse',
+			value: function placeHouse(pos) {
+				var housePos = this.tileToPixel(this.pixelToTile(pos));
+				var _iteratorNormalCompletion = true;
+				var _didIteratorError = false;
+				var _iteratorError = undefined;
+
+				try {
+					for (var _iterator = this.entities[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+						var entity = _step.value;
+
+						if (!(entity instanceof House)) {
+							continue;
+						}
+						if (entity.pos.x === housePos.x && entity.pos.y === housePos.y) {
+							return;
+						}
+					}
+				} catch (err) {
+					_didIteratorError = true;
+					_iteratorError = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion && _iterator.return) {
+							_iterator.return();
+						}
+					} finally {
+						if (_didIteratorError) {
+							throw _iteratorError;
+						}
+					}
+				}
+
+				this.entities.push(new House(this, housePos));
+			}
+		}, {
 			key: 'in',
 			value: function _in(pos) {
 				return !(pos.x < 0 || pos.x >= this.width || pos.y < 0 || pos.y >= this.height);
@@ -194,6 +228,16 @@
 			key: 'atPixel',
 			value: function atPixel(pos) {
 				return this.data[Math.floor(pos.x / this.tileWidth)][Math.floor(pos.y / this.tileHeight)];
+			}
+		}, {
+			key: 'pixelToTile',
+			value: function pixelToTile(pos) {
+				return { x: Math.floor(pos.x / this.tileWidth), y: Math.floor(pos.y / this.tileHeight) };
+			}
+		}, {
+			key: 'tileToPixel',
+			value: function tileToPixel(pos) {
+				return { x: pos.x * this.tileWidth + this.tileWidth / 2, y: pos.y * this.tileHeight + this.tileHeight / 2 };
 			}
 		}]);
 
@@ -213,9 +257,7 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	var C = __webpack_require__(6);
-
-	var VILLAGER_IMAGE = new Image();
-	VILLAGER_IMAGE.src = __webpack_require__(4);
+	var I = __webpack_require__(9);
 
 	var Villager = (function () {
 		function Villager(map, pos) {
@@ -225,7 +267,7 @@
 			this.pos = pos;
 			this.angle = 0;
 			this.path = [];
-			this.image = VILLAGER_IMAGE;
+			this.image = I.VILLAGER;
 
 			this.pixelTarget = null;
 		}
@@ -322,6 +364,7 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	var I = __webpack_require__(9);
 	var House = __webpack_require__(7);
 
 	var View = (function () {
@@ -351,6 +394,12 @@
 				} else if (this.offset.y + this.canvas.height >= this.map.height * this.map.tileHeight) {
 					this.offset.y = this.map.height * this.map.tileHeight - this.canvas.height - 2;
 				}
+			}
+		}, {
+			key: 'renderImageAtTile',
+			value: function renderImageAtTile(image, pos) {
+				var tilePos = map.pixelToTile(pos);
+				this.ctx.drawImage(image, tilePos.x * this.map.tileWidth - this.offset.x + this.map.tileWidth / 2 - image.width / 2, tilePos.y * this.map.tileHeight - this.offset.y + this.map.tileHeight / 2 - image.height / 2);
 			}
 		}, {
 			key: 'render',
@@ -418,6 +467,13 @@
 						}
 					}
 				}
+
+				if (controller.placingHouse) {
+					var absPos = { x: controller.mousePos.x + this.offset.x, y: controller.mousePos.y + this.offset.y };
+					if (map.atPixel(absPos) === undefined) {
+						this.renderImageAtTile(I.HOUSE, absPos);
+					}
+				}
 			}
 		}, {
 			key: 'renderTiles',
@@ -478,18 +534,28 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var Controller = function Controller() {
+	var Controller = function Controller(map) {
 		var _this = this;
 
 		_classCallCheck(this, Controller);
 
+		this.map = map;
 		this.mousePos = { x: 0, y: 0 };
+
 		this.draggingView = false;
+		this.placingHouse = false;
+
 		this.mouseOut = false;
 		this.gameSpeed = 1;
 
 		document.addEventListener('mousedown', function (e) {
 			switch (e.button) {
+				case 0:
+					if (_this.placingHouse) {
+						_this.placingHouse = false;
+						_this.map.placeHouse({ x: _this.mousePos.x + view.offset.x, y: _this.mousePos.y + view.offset.y });
+					}
+					break;
 				case 2:
 					_this.draggingView = true;
 					_this.mousePos.x = e.clientX;
@@ -512,11 +578,10 @@
 						y: _this.mousePos.y - e.clientY
 					});
 				}
-
-				_this.mousePos.x = e.clientX;
-				_this.mousePos.y = e.clientY;
-				_this.mouseOut = false;
 			}
+			_this.mousePos.x = e.clientX;
+			_this.mousePos.y = e.clientY;
+			_this.mouseOut = false;
 		});
 		document.addEventListener('mouseout', function (e) {
 			_this.mouseOut = true;
@@ -531,7 +596,7 @@
 		});
 
 		document.addEventListener('keydown', function (e) {
-			//console.log(e.keyCode)
+			//alert(e.keyCode)
 			switch (e.keyCode) {
 				case 49:
 					_this.gameSpeed = 1;
@@ -544,6 +609,13 @@
 					break;
 				case 52:
 					_this.gameSpeed = 100;
+					break;
+
+				case 72:
+					_this.placingHouse = true;
+					break;
+				case 27:
+					_this.placingHouse = false;
 					break;
 			}
 		});
@@ -588,10 +660,8 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	var I = __webpack_require__(9);
 	var Villager = __webpack_require__(2);
-
-	var HOUSE_IMAGE = new Image();
-	HOUSE_IMAGE.src = __webpack_require__(8);
 
 	var House = (function () {
 		function House(map, pos) {
@@ -599,7 +669,7 @@
 
 			this.map = map;
 			this.pos = pos;
-			this.image = HOUSE_IMAGE;
+			this.image = I.HOUSE;
 
 			this.map.entities.push(new Villager(this.map, { x: pos.x, y: pos.y }));
 		}
@@ -619,6 +689,18 @@
 /***/ function(module, exports) {
 
 	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAZCAYAAAArK+5dAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAFZQAABWUB/iX64wAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAFuSURBVEiJ7ZTLTsJAFIb/mU6HTgVsAWOoRoO3gJelcWN8HV/Eh1O3RgzeEhUkEi4FhLbMMHVrIhpZqCHx35/vy59zcgg+hrtzvDifMEpzCdOLY72VsgyHEeJ1ArVxWHC0I8z7SOlqvRf5oPFtsyerlWZ0XfMHZQDyPYztLCZPktzIh2O9mbKYaxrwlEYma5sAAD9QcAQDAGgNVcjaLJ/mywCQaTOsZgQAoNIYQJhGK5DjWq0b+o5gN8+96InlUuaxK8zce5AfqAnFvo7FKFZcKwsgazGK1Yw4mm8FVTo1aZrEID8rAPAv+FsBIbO+5BjxjDcAZn0H/6/i7wVk9q+IkF9ooMbxj8EDqQm7rPv7aZHYtRjfex2pPDfoWqh0McHokjCp9R1QeyDVc2/UGkh9HSh11+iPamdP3fJtU56Sz4ZsG96C4Ac25dtJm+U5idc7oSodFlydFuxqKMf3VT986fTlxWNjdP4wHNYncd4AEvqPtXQfPg8AAAAASUVORK5CYII="
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	exports.VILLAGER = new Image();
+	exports.VILLAGER.src = __webpack_require__(4);
+
+	exports.HOUSE = new Image();
+	exports.HOUSE.src = __webpack_require__(8);
 
 /***/ }
 /******/ ]);

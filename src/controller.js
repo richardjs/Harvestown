@@ -1,14 +1,24 @@
 'use strict'
 
 class Controller{
-	constructor(){
+	constructor(map){
+		this.map = map
 		this.mousePos = {x: 0, y: 0}
+
 		this.draggingView = false
+		this.placingHouse = false
+
 		this.mouseOut = false
 		this.gameSpeed = 1
 
 		document.addEventListener('mousedown', e => {
 			switch(e.button){
+				case 0:
+					if(this.placingHouse){
+						this.placingHouse = false
+						this.map.placeHouse({x: this.mousePos.x + view.offset.x, y: this.mousePos.y + view.offset.y})
+					}
+					break
 				case 2:
 					this.draggingView = true
 					this.mousePos.x = e.clientX
@@ -31,11 +41,10 @@ class Controller{
 						y: this.mousePos.y - e.clientY
 					})
 				}
-
-				this.mousePos.x = e.clientX
-				this.mousePos.y = e.clientY
-				this.mouseOut = false
 			}
+			this.mousePos.x = e.clientX
+			this.mousePos.y = e.clientY
+			this.mouseOut = false
 		})
 		document.addEventListener('mouseout', e => {
 			this.mouseOut = true
@@ -50,7 +59,7 @@ class Controller{
 		})
 
 		document.addEventListener('keydown', e => {
-			//console.log(e.keyCode)
+			//alert(e.keyCode)
 			switch(e.keyCode){
 				case 49:
 					this.gameSpeed = 1
@@ -63,6 +72,13 @@ class Controller{
 					break
 				case 52:
 					this.gameSpeed = 100
+					break
+				
+				case 72:
+					this.placingHouse = true
+					break
+				case 27:
+					this.placingHouse = false
 					break
 			}
 		})

@@ -1,5 +1,6 @@
 'use strict'
 
+var I = require('./image.js')
 var House = require('./house.js')
 
 class View{
@@ -25,6 +26,15 @@ class View{
 		}else if(this.offset.y + this.canvas.height >= this.map.height*this.map.tileHeight){
 			this.offset.y = this.map.height*this.map.tileHeight - this.canvas.height - 2
 		}
+	}
+
+	renderImageAtTile(image, pos){
+		var tilePos = map.pixelToTile(pos)
+		this.ctx.drawImage(
+			image,
+			tilePos.x*this.map.tileWidth - this.offset.x + this.map.tileWidth/2 - image.width/2,
+			tilePos.y*this.map.tileHeight - this.offset.y + this.map.tileHeight/2 - image.height/2
+		)
 	}
 
 	render(){
@@ -53,6 +63,13 @@ class View{
 			this.ctx.rotate(entity.angle)
 			this.ctx.drawImage(entity.image, - entity.image.width/2, -entity.image.height/2)
 			this.ctx.restore()
+		}
+
+		if(controller.placingHouse){
+			var absPos = {x: controller.mousePos.x + this.offset.x, y: controller.mousePos.y + this.offset.y}
+			if(map.atPixel(absPos) === undefined){
+				this.renderImageAtTile(I.HOUSE, absPos)
+			}
 		}
 	}
 

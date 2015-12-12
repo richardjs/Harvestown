@@ -14,8 +14,6 @@ class Map{
 		this.generateGeography()
 
 		this.entities = []
-		this.entities.push(new House(this, {x: 50, y: 50}))
-		this.entities.push(new House(this, {x: 70, y: 50}))
 	}
 
 	generateGeography(){
@@ -46,6 +44,19 @@ class Map{
 		})
 	}
 
+	placeHouse(pos){
+		var housePos = this.tileToPixel(this.pixelToTile(pos))
+		for(var entity of this.entities){
+			if(!(entity instanceof House)){
+				continue
+			}
+			if(entity.pos.x === housePos.x && entity.pos.y === housePos.y){
+				return
+			}
+		}
+		this.entities.push(new House(this, housePos))
+	}
+
 	in(pos){
 		return !(pos.x < 0 || pos.x >= this.width || pos.y < 0 || pos.y >= this.height)
 	}
@@ -59,6 +70,14 @@ class Map{
 
 	atPixel(pos){
 		return this.data[Math.floor(pos.x / this.tileWidth)][Math.floor(pos.y / this.tileHeight)]
+	}
+
+	pixelToTile(pos){
+		return {x: Math.floor(pos.x / this.tileWidth), y: Math.floor(pos.y / this.tileHeight)}
+	}
+
+	tileToPixel(pos){
+		return {x: pos.x*this.tileWidth + this.tileWidth/2, y: pos.y*this.tileHeight + this.tileHeight/2}
 	}
 }
 

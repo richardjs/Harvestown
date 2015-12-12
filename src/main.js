@@ -18,7 +18,7 @@ window.addEventListener('resize', e => {
 
 global.map = new Map(C.MAP_WIDTH, C.MAP_HEIGHT, C.TILE_WIDTH, C.TILE_HEIGHT)
 global.view = new View(canvas, ctx, map)
-global.controller = new Controller()
+global.controller = new Controller(map)
 
 var lastTime = null;
 function frame(time){
