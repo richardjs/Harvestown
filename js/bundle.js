@@ -66,6 +66,13 @@
 	global.view = new View(canvas, ctx, map);
 	global.controller = new Controller(map);
 
+	var musicVolume = localStorage.getItem('ld34_music_volume') || .25;
+	global.music = new Howl({
+		urls: ['bgm/music.ogg'],
+		volume: musicVolume,
+		loop: true
+	}).play();
+
 	var lastTime = null;
 	function frame(time) {
 		if (lastTime === null) {
@@ -133,7 +140,7 @@
 
 	// Villager parameters
 	exports.VILLAGER_SPEED = 20;
-	exports.VILLAGER_WANDER_RANGE = 5;
+	exports.VILLAGER_WANDER_RANGE = 10;
 	exports.VILLAGER_HUNGER_TIME = 60 * 1000;
 	exports.VILLAGER_WORK_TIME = 1000;
 
@@ -1597,6 +1604,24 @@
 					_this.placingHouse = false;
 					_this.placingTree = false;
 					_this.deleting = false;
+					break;
+
+				case 173:
+					music.volume(Math.max(music.volume() - .05, 0));
+					localStorage.setItem('ld34_music_volume', music.volume());
+					break;
+				case 61:
+					music.volume(Math.min(music.volume() + .05, 1));
+					localStorage.setItem('ld34_music_volume', music.volume());
+					break;
+				case 77:
+					if (music.paused) {
+						music.play();
+						music.paused = false;
+					} else {
+						music.pause();
+						music.paused = true;
+					}
 					break;
 			}
 		});

@@ -118,6 +118,24 @@ class Controller{
 					this.placingTree = false
 					this.deleting = false
 					break
+
+				case 173:
+					music.volume(Math.max(music.volume() - .05, 0))
+					localStorage.setItem('ld34_music_volume', music.volume())
+					break
+				case 61:
+					music.volume(Math.min(music.volume() + .05, 1))
+					localStorage.setItem('ld34_music_volume', music.volume())
+					break
+				case 77:
+					if(music.paused){
+						music.play()
+						music.paused = false
+					}else{
+						music.pause()
+						music.paused = true
+					}
+					break
 			}
 		})
 	}
