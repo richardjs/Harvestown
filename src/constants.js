@@ -12,6 +12,7 @@ exports.TILE_HEIGHT = 20
 exports.VILLAGER_SPEED = 20
 exports.VILLAGER_WANDER_RANGE = 5
 exports.VILLAGER_HUNGER_TIME = 60*1000
+exports.VILLAGER_WORK_TIME = 1000
 
 //Farm parameters
 exports.FARM_GROWTH_TIME = 60*3.5*1000

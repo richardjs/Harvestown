@@ -25,6 +25,8 @@ class Villager{
 		this.activeFarm = null
 		this.activeHouse = null
 		this.activeSapling = null
+
+		this.pauseTimer = 0
 	}
 
 	get tile(){
@@ -145,7 +147,7 @@ class Villager{
 		// Past here, we've stopped walking, and thus need to make a decision about what to do
 		
 		// If we're hungry, go home, or eat if we are home
-		if(this.hungry && !this.carryingLumber && !this.carryingFood){
+		if(this.hungry && !this.carryingLumber && !this.carryingFood && this.pauseTimer <= 0){
 			// Abandon projects so someone else can work on them
 			if(this.activeHouse){
 				this.activeHouse.activeVillager = null
@@ -169,14 +171,23 @@ class Villager{
 					this.house.inactive = true
 					this.carryingFood = false
 					this.carryingLumber = false
+					this.pauseTimer = 0
 				}
 			}
 			// Else, go home
 			else{
 				this.goToTile(this.house.tile)
+				this.pauseTimer = C.VILLAGER_WORK_TIME
 			}
 			return
 		}
+
+		// If we're pausing, pause
+		if(this.pauseTimer > 0){
+			this.pauseTimer -= delta
+			return
+		}
+		
 			
 		// activeFarm indicates we're working a farm
 		if(this.activeFarm){
@@ -199,6 +210,7 @@ class Villager{
 							this.activeFarm = null
 							this.carryingFood = true
 							this.goToTile(this.depot.tile)
+							this.pauseTimer = C.VILLAGER_WORK_TIME
 						}
 						// Else, forget about the farm
 						else{
@@ -212,6 +224,7 @@ class Villager{
 			// Else, we're not at the farm; go to it
 			else{
 				this.goToTile(this.activeFarm.tile)
+				this.pauseTimer = C.VILLAGER_WORK_TIME
 				// If there's no way to get to the farm, forget about it
 				if(this.pixelTarget){
 					this.activeFarm.activeVillager = null
@@ -236,6 +249,7 @@ class Villager{
 					if(newDepot){
 						this.depot = newDepot
 						this.goToTile(newDepot.tile)
+						this.pauseTimer = C.VILLAGER_WORK_TIME
 						return
 					}
 				}
@@ -286,6 +300,7 @@ class Villager{
 					map.removedTrees.push(tree)
 					this.carryingLumber = true
 					this.goToTile(this.activeHouse.tile)
+					this.pauseTimer = C.VILLAGER_WORK_TIME
 					return
 				}
 
@@ -348,6 +363,7 @@ class Villager{
 				}
 				if(tile != null){
 					this.goToTile(tile.prev)
+					this.pauseTimer = C.VILLAGER_WORK_TIME
 				}else{
 					// We're out of trees. Forget about it.
 					// This probably only happens if you use up all the trees on purpose.
@@ -405,6 +421,7 @@ class Villager{
 				this.activeSapling = closestSapling
 				this.activeSapling.activeVillager = this
 				this.goToTile(closestSapling.tile)
+				this.pauseTimer = C.VILLAGER_WORK_TIME
 				return
 			}
 		}
@@ -429,6 +446,7 @@ class Villager{
 			closestFarm.activeVillager = this
 			this.activeFarm = closestFarm
 			this.goToTile(closestFarm.tile)
+			this.pauseTimer = C.VILLAGER_WORK_TIME
 			if(this.path.pixelTarget !== null){
 				return
 			}else{
