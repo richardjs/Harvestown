@@ -225,6 +225,7 @@ class Villager{
 				// Only deposit if depot isn't full
 				if(this.depot.food < C.HOUSE_MAX_FOOD){
 					this.depot.food++
+					this.depot.inactive = false
 				}
 				//Else if depot is full, try to find a new one
 				else{

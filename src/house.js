@@ -36,7 +36,6 @@ class House{
 
 	build(){
 		this.lumber++
-		this.inactive = false
 		if(this.built){
 			this.image = I.HOUSE
 			this.spawnVillager()
