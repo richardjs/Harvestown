@@ -11,6 +11,8 @@ exports.HOUSE = new Image()
 exports.HOUSE.src = require('../img/house.png')
 exports.HOUSE_FOUNDATION = new Image()
 exports.HOUSE_FOUNDATION.src = require('../img/house_foundation.png')
+exports.HOUSE_FLOOR = new Image()
+exports.HOUSE_FLOOR.src = require('../img/house_floor.png')
 
 exports.FARM_UNPLANTED = new Image()
 exports.FARM_UNPLANTED.src = require('../img/farm_unplanted.png')

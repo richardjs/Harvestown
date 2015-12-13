@@ -38,6 +38,7 @@ class House{
 
 	build(){
 		this.lumber++
+		this.image = I.HOUSE_FLOOR
 		if(this.built){
 			this.image = I.HOUSE
 			this.spawnVillager()

@@ -416,6 +416,7 @@
 			key: 'build',
 			value: function build() {
 				this.lumber++;
+				this.image = I.HOUSE_FLOOR;
 				if (this.built) {
 					this.image = I.HOUSE;
 					this.spawnVillager();
@@ -464,6 +465,8 @@
 	exports.HOUSE.src = __webpack_require__(6);
 	exports.HOUSE_FOUNDATION = new Image();
 	exports.HOUSE_FOUNDATION.src = __webpack_require__(16);
+	exports.HOUSE_FLOOR = new Image();
+	exports.HOUSE_FLOOR.src = __webpack_require__(25);
 
 	exports.FARM_UNPLANTED = new Image();
 	exports.FARM_UNPLANTED.src = __webpack_require__(12);
@@ -1810,6 +1813,12 @@
 /***/ function(module, exports) {
 
 	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAFAQAABQEBbNEZDAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACRSURBVDiNtdQxDsMwCIXhn961S5RcpvLSy+Z1SaQqMjbQ1KvNZyzACEzwEmwUl+ApeAsMQRNIsAuWArYcsRK0U9+/0HCmndjV25iiLjY44KJTLIOGsQiaxkZoGRugdcxBQ9ijcI/dkd31ybkx7RWgPFGjaqbRSGuE0UyfTdFK07roLxPQRfWHD9YONI1d0CawD+OBJtjZ/u/8AAAAAElFTkSuQmCC"
+
+/***/ },
+/* 25 */
+/***/ function(module, exports) {
+
+	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAARCAYAAAA/mJfHAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAEdQAABHUBEISLqgAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABHSURBVDiNYzQUYbijxMfAwUAhuPeJ4QeLIg8Dh64ggzSlhv3/x/CUiVJDkMGoYaOGjRo2Agxjuf+F4QcjE8NTSg26/4XhBwB58w41MkAQfQAAAABJRU5ErkJggg=="
 
 /***/ }
 /******/ ]);
