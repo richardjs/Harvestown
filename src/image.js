@@ -22,3 +22,6 @@ exports.FARM_GROWING = new Image()
 exports.FARM_GROWING.src = require('../img/farm_growing.png')
 exports.FARM_MATURED = new Image()
 exports.FARM_MATURED.src = require('../img/farm_matured.png')
+
+exports.TREE = new Image()
+exports.TREE.src = require('../img/tree.png')

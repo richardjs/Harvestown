@@ -29,8 +29,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="7.9195959"
-     inkscape:cx="62.61567"
-     inkscape:cy="40.81704"
+     inkscape:cx="66.18255"
+     inkscape:cy="41.09757"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -65,7 +65,7 @@
        id="path4150"
        d="m 104,1022.3622 0,-24.28571 9.28571,-5.71429 10.71429,5.35714 0,24.64286 z"
        style="fill:#f9a772;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_lumber.png"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
        inkscape:export-xdpi="13.846154"
        inkscape:export-ydpi="13.846154" />
     <path
@@ -74,7 +74,7 @@
        id="path4148"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccccc"
-       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_lumber.png"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
        inkscape:export-xdpi="13.846154"
        inkscape:export-ydpi="13.846154" />
     <path
@@ -93,7 +93,10 @@
        inkscape:randomized="0"
        d="m 22.216826,1015.1095 -2.474643,-0.7595 -1.265672,2.258 -2.177955,-1.399 -1.827954,1.8329 -1.719739,-1.9348 -2.254665,1.2717 -1.1339775,-2.327 -2.5141584,0.6163 -0.4641139,-2.5466 -2.5871878,-0.085 0.2401706,-2.5774 -2.4683374,-0.7798 0.9266429,-2.417 -2.16642161,-1.4168 1.54439021,-2.0774 -1.70383226,-1.9488 2.04759726,-1.58369 -1.1148775,-2.3362 2.3989434,-0.97253 -0.4432374,-2.55035 2.5723708,-0.28925 0.2612756,-2.57536 2.5550173,0.4155 0.946411,-2.40937 2.3481697,1.08943 1.561356,-2.06468 1.967169,1.68255 2.060501,-1.56687 1.440273,2.1509 2.406829,-0.95285 0.806558,2.45972 2.574654,-0.26816 0.113024,2.58611 2.551528,0.43642 -0.588892,2.5207 2.339167,1.10863 -1.247133,2.26835 1.953321,1.6986 -1.812879,1.8478 1.422605,2.1626 -2.244173,1.2901 0.786382,2.4663 -2.509026,0.6368 0.09184,2.5869 -2.587797,-0.064 z"
        inkscape:transform-center-x="-0.028988997"
-       inkscape:transform-center-y="0.039953633" />
+       inkscape:transform-center-y="0.039953633"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
     <path
        inkscape:transform-center-y="0.039953633"
        inkscape:transform-center-x="-0.028988997"
@@ -110,14 +113,20 @@
        sodipodi:sides="23"
        id="path8054"
        style="fill:#ffcc00;fill-opacity:1;stroke:none;stroke-opacity:1"
-       sodipodi:type="star" />
+       sodipodi:type="star"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
     <ellipse
        style="fill:#280b0b;fill-opacity:1;stroke:none;stroke-opacity:1"
        id="path8770"
        cx="107.58125"
        cy="1009.0519"
        rx="0.63134533"
-       ry="1.1364216" />
+       ry="1.1364216"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
     <ellipse
        style="fill:#9e0002;fill-opacity:1"
        id="path4142"
@@ -125,40 +134,51 @@
        cy="1021.4782"
        rx="62.5"
        ry="17.51115"
-       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_lumber.png"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
        inkscape:export-xdpi="13.846154"
        inkscape:export-ydpi="13.846154" />
     <path
-       style="fill:#01015b;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 32,1036.9617 0,-30.7359 -6.13642,0.7576 0,29.1161 z"
-       id="path4152"
+       style="fill:#ffcc00;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 15,1032.3622 -7.6008877,2.6009 -0.7576144,13.9143 8.2829961,2.9797 95.024746,0.1263 8.53553,-3.106 -0.37881,-13.9143 L 110,1032.3622 Z"
+       id="path8772"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccc"
-       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_lumber.png"
+       sodipodi:nodetypes="ccccccccc"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.98506558px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 7.0203051,1042.3622 111.5907349,0"
+       id="path8774"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
        inkscape:export-xdpi="13.846154"
        inkscape:export-ydpi="13.846154" />
     <path
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="path4154"
-       d="m 93.12627,1036.9617 0,-30.7359 6.6415,0.7576 0,29.1161 z"
+       d="m 93.12627,1052.114 0,-45.8882 6.6415,1.1311 0.50508,44.8588 z"
        style="fill:#01015b;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_lumber.png"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
        inkscape:export-xdpi="13.846154"
        inkscape:export-ydpi="13.846154" />
     <path
-       style="fill:#ffcc00;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 15,1032.3622 7.3991123,1034.9631 5,1047.3622 l 5,5 105,0 5,-5 -1.89404,-12.3991 L 110,1032.3622 Z"
-       id="path8772"
+       style="fill:#01015b;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 32,1051.9878 0,-45.762 -6.13642,1.128 0,44.6059 z"
+       id="path4152"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccccccc" />
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
     <circle
        style="fill:#501616;fill-opacity:1"
        id="path4140"
        cx="62.5"
        cy="1019.8622"
        r="27.5"
-       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_lumber.png"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
        inkscape:export-xdpi="13.846154"
        inkscape:export-ydpi="13.846154" />
     <path
@@ -166,7 +186,7 @@
        d="m 65,997.3622 5,-10 5,10 10,0 -5,5 10,5 -5,5 10,5 -10,10 5,10 -10,0 0,10 -10,-5 -10,10 -5,-10 -10,5 5,-10 -15,0 5,-10 -10,-5 10,-5 -5,-10 15,-5 -5,-10 10,5 5,-10 z"
        id="path4144"
        inkscape:connector-curvature="0"
-       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_lumber.png"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
        inkscape:export-xdpi="13.846154"
        inkscape:export-ydpi="13.846154" />
     <ellipse
@@ -175,110 +195,158 @@
        cx="11.490485"
        cy="997.81396"
        rx="0.37880722"
-       ry="0.88388348" />
+       ry="0.88388348"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
     <ellipse
        style="fill:#280b0b;fill-opacity:1;stroke:none;stroke-opacity:1"
        id="path8720"
        cx="19.697975"
        cy="996.17249"
        rx="0.50507629"
-       ry="0.75761443" />
+       ry="0.75761443"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
     <ellipse
        style="fill:#280b0b;fill-opacity:1;stroke:none;stroke-opacity:1"
        id="path8726"
        cx="8.8388348"
        cy="1002.7384"
        rx="0.50507629"
-       ry="0.63134533" />
+       ry="0.63134533"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
     <ellipse
        style="fill:#280b0b;fill-opacity:1;stroke:none;stroke-opacity:1"
        id="path8728"
        cx="18.309015"
        cy="1001.9809"
        rx="0.50507629"
-       ry="1.1364216" />
+       ry="1.1364216"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
     <ellipse
        style="fill:#280b0b;fill-opacity:1;stroke:none;stroke-opacity:1"
        id="path8730"
        cx="14.520943"
        cy="1002.8647"
        rx="0.12626907"
-       ry="0.75761443" />
+       ry="0.75761443"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
     <ellipse
        style="fill:#280b0b;fill-opacity:1;stroke:none;stroke-opacity:1"
        id="path8734"
        cx="22.223356"
        cy="1004.8851"
        rx="0.12626907"
-       ry="0.88388348" />
+       ry="0.88388348"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
     <ellipse
        style="fill:#280b0b;fill-opacity:1;stroke:none;stroke-opacity:1"
        id="path8736"
        cx="9.0913725"
        cy="1006.9053"
        rx="0.37880722"
-       ry="0.75761443" />
+       ry="0.75761443"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
     <ellipse
        style="fill:#280b0b;fill-opacity:1;stroke:none;stroke-opacity:1"
        id="path8738"
        cx="13.889597"
        cy="1008.168"
        rx="0.37880722"
-       ry="1.0101526" />
+       ry="1.0101526"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
     <ellipse
        style="fill:#280b0b;fill-opacity:1;stroke:none;stroke-opacity:1"
        id="path8740"
        cx="15.531095"
        cy="994.78351"
        rx="0.12626907"
-       ry="1.5152289" />
+       ry="1.5152289"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
     <circle
        style="fill:#280b0b;fill-opacity:1;stroke:none;stroke-opacity:1"
        id="path8749"
        cx="107.32871"
        cy="996.55127"
-       r="0.50507629" />
+       r="0.50507629"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
     <ellipse
        style="fill:#280b0b;fill-opacity:1;stroke:none;stroke-opacity:1"
        id="path8751"
        cx="115.78874"
        cy="996.42499"
        rx="0.50507629"
-       ry="1.0101526" />
+       ry="1.0101526"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
     <ellipse
        style="fill:#280b0b;fill-opacity:1;stroke:none;stroke-opacity:1"
        id="path8753"
        cx="110.35917"
        cy="1000.7181"
        rx="0.63134533"
-       ry="1.3889598" />
+       ry="1.3889598"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
     <ellipse
        style="fill:#280b0b;fill-opacity:1;stroke:none;stroke-opacity:1"
        id="path8757"
        cx="103.66691"
        cy="999.32916"
        rx="0.37880722"
-       ry="1.3889598" />
+       ry="1.3889598"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
     <ellipse
        style="fill:#280b0b;fill-opacity:1;stroke:none;stroke-opacity:1"
        id="path8759"
        cx="116.54635"
        cy="1003.7486"
        rx="0.37880722"
-       ry="1.1364216" />
+       ry="1.1364216"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
     <ellipse
        style="fill:#280b0b;fill-opacity:1;stroke:none;stroke-opacity:1"
        id="path8761"
        cx="104.42452"
        cy="1005.1376"
        rx="0.37880722"
-       ry="0.50507629" />
+       ry="0.50507629"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
     <ellipse
        style="fill:#280b0b;fill-opacity:1;stroke:none;stroke-opacity:1"
        id="path8768"
        cx="114.27351"
        cy="1008.5468"
        rx="0.25253814"
-       ry="0.88388348" />
+       ry="0.88388348"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager_food.png"
+       inkscape:export-xdpi="13.846154"
+       inkscape:export-ydpi="13.846154" />
   </g>
 </svg>

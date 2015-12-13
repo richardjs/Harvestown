@@ -431,6 +431,9 @@
 	exports.FARM_MATURED = new Image();
 	exports.FARM_MATURED.src = __webpack_require__(14);
 
+	exports.TREE = new Image();
+	exports.TREE.src = __webpack_require__(19);
+
 /***/ },
 /* 5 */
 /***/ function(module, exports) {
@@ -1217,27 +1220,7 @@
 			}
 		}, {
 			key: 'updateTileImage',
-			value: function updateTileImage(onlyPos) {
-				if (onlyPos) {
-					switch (this.map.data[onlyPos.x][onlyPos.y]) {
-						case 'water':
-							this.tileCtx.fillStyle = '#008';
-							break;
-						case 'tree':
-							this.tileCtx.fillStyle = '#040';
-							break;
-						default:
-							this.tileCtx.fillStyle = '#171';
-					}
-					this.tileCtx.fillRect(onlyPos.x * this.map.tileWidth, onlyPos.y * this.map.tileHeight, this.map.tileWidth, this.map.tileHeight);
-					this.tileCtx.strokeStyle = '#040';
-					this.tileCtx.lineWidth = .5;
-					this.tileCtx.strokeRect(onlyPos.x * this.map.tileWidth, onlyPos.y * this.map.tileHeight, this.map.tileWidth, this.map.tileHeight);
-					this.tileImage = new Image();
-					this.tileImage.src = this.tileCanvas.toDataURL();
-					return;
-				}
-
+			value: function updateTileImage() {
 				var canvas = document.createElement('canvas');
 				var ctx = canvas.getContext('2d');
 				canvas.width = this.map.width * this.map.tileWidth;
@@ -1250,15 +1233,17 @@
 						switch (this.map.data[x][y]) {
 							case 'water':
 								ctx.fillStyle = '#008';
+								ctx.strokeStyle = '#22a';
 								break;
 							case 'tree':
 								ctx.fillStyle = '#040';
+								ctx.strokeStyle = '#040';
 								break;
 							default:
 								ctx.fillStyle = '#171';
+								ctx.strokeStyle = '#040';
 						}
 						ctx.fillRect(x * this.map.tileWidth, y * this.map.tileHeight, this.map.tileWidth, this.map.tileHeight);
-						ctx.strokeStyle = '#040';
 						ctx.lineWidth = .5;
 						ctx.strokeRect(x * this.map.tileWidth, y * this.map.tileHeight, this.map.tileWidth, this.map.tileHeight);
 					}
@@ -1522,6 +1507,12 @@
 /***/ function(module, exports) {
 
 	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAATCAYAAACp65zuAAAABHNCSVQICAgIfAhkiAAAAAFzUkdCAK7OHOkAAAAEZ0FNQQAAsY8L/GEFAAAACXBIWXMAAAIhAAACIQE+ERCTAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAhVJREFUOE99UktoE1EUPe++mXFIG2IaNFI00I+hbhTNwoKoiBXEogguXerCD0LBjS6kdKE7N27EXRE34kIKXdTPogu/2AoGpNrGFgNKmuLYpJMmnd/te0HBEvXAcN88zjv3dwT+wCjQQ7b9uvtgn+y/2h5QfCYBNr+IWOmY4Gncnyvi9M4M3o7mRIUhzkA9P/kgwuYeQKizhDFGYBxnRlzFAaNNnGpKM1AYFwhDIFJnyGA7ORXLrLgWnKqFGllmDSqqb/6d7VmW4lDz4V2xN3sicFZMaRqA+x0w4cGLLJU94vz4xLkt2/y8yGFa8BSc2SKSpXkbz29JfKIYUoEPUvVkPO/AtXr9la5GBG/gfPhMydsjKay6G4agyYuBEHuq5fIPUl3izs2OFpJGJERalfg+qwSpMGfIyrKu+J/oXEyn99HjRzH718X/cJQuXllZbU26ERRFbdQeZzYtPdW/Q4l8/bm0NEwcQpwfqiAWayVL5iqYRyaBoGWOC8LGGhF21OtIAkduuK7iKeXdvYNBrUHSMoFqUW0rAmzZQCPcxPmJJ5dTHf4MXLwQk/e2VktOFO/qZDy9pIxQY2inpLqi8MLDZamNYZq4bhzOlddU6ng2A8yCfF+vW6Gvn6Uf6EnrP5zV4Zlaa6BEpvwajzWvVau9g6LpHKF7ZGPh9wh1ZO1wadsvuw/tMvcPJT1KfExwaBQo8W1gHT/j15zDvNgCAAAAAElFTkSuQmCC"
+
+/***/ },
+/* 19 */
+/***/ function(module, exports) {
+
+	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAUCAYAAABvVQZ0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAACxAAAAsQBW5GdCwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAKTSURBVDiNjdNNa1xVGAfw352Z3nlJpskknWSI0Y5CN1atJHHVTS1FoeJC0EU2IvQDlH4BKbgV0Y0ouFHQZXAhguCyLpRSCy11dNPYRLHUpjPJZJLMJBkX86ROJUIPXO6955zn//xfzsn6/1Hwqi+c8rbUjrsaYFzdtKKW9n8LkkNhqmpO+9xzXvEAm/Z1/SJnTEXNiu8tOY/+4WB1dfM+lHpa4hnjRrWQ4gg2cDT27ulruOSKj4bBsg+/XvSOeRetm1aQ2g6QXvRPsYs8OhI1c8aUrPvZlp1HwRZcUnZSJwpTVFHAMeRi90bo2TPieS+bsajojlWNDJj3mopzfg/gDMrB6MmYmw5Wx2Oui9uYUld2EnLmveVZn+iYkMbmTVQCtI/JeFexHtILKGH5X7tyTnjXiAl4GHYp/JrFVrDIR5Ms/g7m7bAjb3ogaMd1laGFTYzF02RgbayXo0kRo+FdguMWvWAuq+oJU85roh6dU0yF2W2sYiLSzEYYD7AdzWYU7JnN2NezFkxaIWmQ1sCzJPzqx1w2QDIBPoY/0dPOmLKgG/TbsTkbcnMh50SAjaATDdNY30ZP068uZ+TNmQlWB4za8X80jE+CQSfYbEeiB36u+cpvGhkrPtC1phAbdwMsidg3ItH7Q+8EfwTbWfS1BkfjB1/q2TTnM12T1kPCfsjoR3r3wordaHDgMSSDCz+4AT/52j3f2oqunZCXj9RWA/huAHRi/giW3dT0I8N3s+KYl7xuL8xvRmE7fFwbYpbDiL80XPaNC1bcehSsZVnJKX1dZUVdqXwkd3AsulFRw1XvueL9WAm1h41RVWd86ilvxGHtu+OGfUVlNfdds+RsOPtYI+ucj73pOwsWhxqXMH5YwT9jasiwppwhAQAAAABJRU5ErkJggg=="
 
 /***/ }
 /******/ ]);

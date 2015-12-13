@@ -148,27 +148,7 @@ class View{
 		this.ctx.drawImage(this.tileImage, -this.offset.x, -this.offset.y)
 	}
 
-	updateTileImage(onlyPos){
-		if(onlyPos){
-			switch(this.map.data[onlyPos.x][onlyPos.y]){
-				case 'water':
-					this.tileCtx.fillStyle = '#008'
-					break
-				case 'tree':
-					this.tileCtx.fillStyle = '#040'
-					break
-				default:
-					this.tileCtx.fillStyle = '#171'
-			}
-			this.tileCtx.fillRect(onlyPos.x*this.map.tileWidth, onlyPos.y*this.map.tileHeight, this.map.tileWidth, this.map.tileHeight)
-			this.tileCtx.strokeStyle = '#040'
-			this.tileCtx.lineWidth = .5
-			this.tileCtx.strokeRect(onlyPos.x*this.map.tileWidth, onlyPos.y*this.map.tileHeight, this.map.tileWidth, this.map.tileHeight)
-			this.tileImage = new Image()
-			this.tileImage.src = this.tileCanvas.toDataURL()
-			return
-		}
-
+	updateTileImage(){
 		var canvas = document.createElement('canvas')
 		var ctx = canvas.getContext('2d')
 		canvas.width = this.map.width * this.map.tileWidth
@@ -181,15 +161,17 @@ class View{
 				switch(this.map.data[x][y]){
 					case 'water':
 						ctx.fillStyle = '#008'
+						ctx.strokeStyle = '#22a'
 						break
 					case 'tree':
 						ctx.fillStyle = '#040'
+						ctx.strokeStyle = '#040'
 						break
 					default:
 						ctx.fillStyle = '#171'
+						ctx.strokeStyle = '#040'
 				}
 				ctx.fillRect(x*this.map.tileWidth, y*this.map.tileHeight, this.map.tileWidth, this.map.tileHeight)
-				ctx.strokeStyle = '#040'
 				ctx.lineWidth = .5
 				ctx.strokeRect(x*this.map.tileWidth, y*this.map.tileHeight, this.map.tileWidth, this.map.tileHeight)
 			}

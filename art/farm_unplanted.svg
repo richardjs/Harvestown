@@ -29,16 +29,16 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="3.959798"
-     inkscape:cx="128.14465"
+     inkscape:cx="127.63957"
      inkscape:cy="39.523132"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1920"
      inkscape:window-height="1028"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
-     inkscape:window-maximized="1">
+     inkscape:window-x="-32000"
+     inkscape:window-y="-32000"
+     inkscape:window-maximized="0">
     <inkscape:grid
        type="xygrid"
        id="grid5332" />
@@ -65,7 +65,7 @@
        id="path5340"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccc"
-       inkscape:export-filename="C:\Users\Richard\code\ld34\img\farm_bare.png"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\farm_unplanted.png"
        inkscape:export-xdpi="28.129999"
        inkscape:export-ydpi="28.129999" />
     <path
@@ -74,7 +74,7 @@
        id="path5372"
        d="m 16,988.3622 16.1,0 0,64 -16.1,0 z"
        style="fill:#cd7b3e;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       inkscape:export-filename="C:\Users\Richard\code\ld34\img\farm_bare.png"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\farm_unplanted.png"
        inkscape:export-xdpi="28.129999"
        inkscape:export-ydpi="28.129999" />
     <path
@@ -83,7 +83,7 @@
        id="path5376"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccc"
-       inkscape:export-filename="C:\Users\Richard\code\ld34\img\farm_bare.png"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\farm_unplanted.png"
        inkscape:export-xdpi="28.129999"
        inkscape:export-ydpi="28.129999" />
     <path
@@ -92,7 +92,7 @@
        id="path5380"
        d="m 48,988.3622 16,0 0,64 -16,0 z"
        style="fill:#cd7b3e;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       inkscape:export-filename="C:\Users\Richard\code\ld34\img\farm_bare.png"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\farm_unplanted.png"
        inkscape:export-xdpi="28.129999"
        inkscape:export-ydpi="28.129999" />
   </g>
