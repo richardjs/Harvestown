@@ -363,6 +363,8 @@
 				this.spawnVillager();
 			}
 
+			this.inactive = false;
+
 			this.activeVillager = null;
 		}
 
@@ -370,6 +372,7 @@
 			key: 'build',
 			value: function build() {
 				this.lumber++;
+				this.inactive = false;
 				if (this.built) {
 					this.image = I.HOUSE;
 					this.spawnVillager();
@@ -644,6 +647,18 @@
 								this.hungry = false;
 								this.hungerTimer = C.VILLAGER_HUNGER_TIME;
 								this.house.food--;
+							} else {
+								this.house.inactive = true;
+								if (this.activeHouse) {
+									this.activeHouse.activeVillager = null;
+									this.activeHouse = null;
+								}
+								if (this.activeFarm) {
+									this.activeFarm.activeVillager = null;
+									this.activeFarm = null;
+								}
+								this.carryingFood = false;
+								this.carryingLumber = false;
 							}
 						} else {
 							this.goToTile(this.house.tile);
@@ -789,7 +804,6 @@
 									if (entity.activeVillager) {
 										continue;
 									}
-									console.log('farming');
 									entity.activeVillager = this;
 									this.activeFarm = entity;
 									this.goToTile(entity.tile);
@@ -1059,6 +1073,8 @@
 							this.ctx.fillStyle = 'green';
 						} else if (entity.food > 0) {
 							this.ctx.fillStyle = 'yellow';
+						} else if (entity.inactive) {
+							this.ctx.fillStyle = '#333';
 						} else {
 							this.ctx.fillStyle = 'red';
 						}

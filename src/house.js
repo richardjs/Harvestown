@@ -20,6 +20,8 @@ class House{
 			this.image = I.HOUSE
 			this.spawnVillager()
 		}
+
+		this.inactive = false
 	
 		this.activeVillager = null
 	}
@@ -34,6 +36,7 @@ class House{
 
 	build(){
 		this.lumber++
+		this.inactive = false
 		if(this.built){
 			this.image = I.HOUSE
 			this.spawnVillager()

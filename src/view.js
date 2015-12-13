@@ -118,6 +118,8 @@ class View{
 				this.ctx.fillStyle = 'green'
 			}else if(entity.food > 0){
 				this.ctx.fillStyle = 'yellow'
+			}else if(entity.inactive){
+				this.ctx.fillStyle = '#333'
 			}else{
 				this.ctx.fillStyle = 'red'
 			}

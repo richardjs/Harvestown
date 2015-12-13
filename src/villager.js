@@ -172,6 +172,18 @@ class Villager{
 						this.hungry = false
 						this.hungerTimer = C.VILLAGER_HUNGER_TIME
 						this.house.food--
+					}else{
+						this.house.inactive = true
+						if(this.activeHouse){
+							this.activeHouse.activeVillager = null
+							this.activeHouse = null
+						}
+						if(this.activeFarm){
+							this.activeFarm.activeVillager = null
+							this.activeFarm = null
+						}
+						this.carryingFood = false
+						this.carryingLumber = false
 					}
 				}else{
 					this.goToTile(this.house.tile)
@@ -289,7 +301,6 @@ class Villager{
 						if(entity.activeVillager){
 							continue
 						}
-						console.log('farming')
 						entity.activeVillager = this
 						this.activeFarm = entity
 						this.goToTile(entity.tile)
