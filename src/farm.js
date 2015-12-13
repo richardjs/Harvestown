@@ -39,6 +39,13 @@ class Farm{
 		this.activeVillager = null
 	}
 
+	harvest(){
+		this.state = 'unplanted'
+		this.growthTimer = 0
+		this.image = I.FARM_UNPLANTED
+		this.activeVillager = null
+	}
+
 	update(delta){
 		if(this.state !== 'planted'){
 			return

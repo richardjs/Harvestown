@@ -3,6 +3,7 @@
 var C = require('./constants.js')
 var I = require('./image.js')
 var Farm = require('./farm.js')
+var House = require('./house.js')
 
 class Villager{
 	constructor(map, house){
@@ -12,8 +13,10 @@ class Villager{
 		this.angle = 0
 		this.path = []
 
-		this.state = 'idle'
+		this.hungry = false
 		this.hungerTimer = C.VILLAGER_HUNGER_TIME
+		this.carryingFood = false
+		this.depot = null
 
 		this.image = I.VILLAGER
 
@@ -64,11 +67,19 @@ class Villager{
 		this.setMapTarget(this.path.shift())
 	}
 
+	wander(center){
+		var wanderRange = C.VILLAGER_WANDER_RANGE
+		this.goToTile({
+			x: Math.round(this.map.pixelToTile(center).x + (Math.random()*2*wanderRange - wanderRange)),
+			y: Math.round(this.map.pixelToTile(center).y + (Math.random()*2*wanderRange - wanderRange))
+		})
+	}
+
 	update(delta){
 		if(this.hungerTimer > 0){
 			this.hungerTimer -= delta
 		}else{
-			this.state = 'hungry'
+			this.hungry = true
 		}
 
 		if(this.pixelTarget){
@@ -91,53 +102,97 @@ class Villager{
 				this.nextPathNode()
 			}
 		}else{
-			// We've reacher our destination
+			// We're stopped
+			
+			// If we're at the farm we were heading to, work it
 			if(this.activeFarm){
 				if(this.activeFarm.tile.x === this.tile.x && this.activeFarm.tile.y === this.tile.y){
-					if(this.activeFarm.state === 'unplanted'){
-						this.activeFarm.plant()
+					switch(this.activeFarm.state){
+						case 'unplanted':
+							this.activeFarm.plant()
+							this.activeFarm = null
+							break
+
+						case 'matured':
+							this.depot = null
+							if(this.house.food < C.HOUSE_MAX_FOOD){
+								this.depot = this.house
+							}else{
+								for(var entity of this.map.entities){
+									if(entity instanceof House.constructor){
+										if(entity.food < C.HOUSE_MAX_FOOD){
+											this.depot = entity
+											break
+										}
+									}
+								}
+							}
+							if(this.depot){
+								this.activeFarm.harvest()
+								this.activeFarm = null
+								this.carryingFood = true
+								this.goToTile(this.depot.tile)
+							}else{
+								this.wander(this.activeFarm.pos)
+								this.activeFarm.activeVillager = null
+								this.activeFarm = null
+							}
+							break
+					}
+				}else{
+					this.goToTile(this.activeFarm.tile)
+					if(this.path.length === 0){
+						this.activeFarm.activeVillager = null
 						this.activeFarm = null
+					}
+				}
+				return
+			}
+
+			if(this.carryingFood){
+				if(this.depot.tile.x === this.tile.x && this.depot.tile.y === this.tile.y){
+					if(this.depot.food < C.HOUSE_MAX_FOOD){
+						this.depot.food++
+					}
+				}
+				this.depot = null
+				this.carryingFood = false
+				return
+			}
+
+			// If we're hungry, go home, or eat if we are home
+			if(this.hungry){
+				if(this.tile.x === this.house.tile.x && this.tile.y === this.house.tile.y){
+					if(this.house.food > 0){
+						this.hungry = false
+						this.hungerTimer = C.VILLAGER_HUNGER_TIME
+						this.house.food--
+					}
+				}else{
+					this.goToTile(this.house.tile)
+				}
+				return
+			}
+
+			// Look for farms to work
+			for(var entity of this.map.entities){
+				if(entity instanceof Farm){
+					if(entity.state === 'unplanted' || entity.state === 'matured'){
+						if(entity.activeVillager){
+							continue
+						}
+						entity.activeVillager = this
+						this.activeFarm = entity
+						this.goToTile(entity.tile)
+						if(this.path.pixelTarget !== null){
+							return
+						}
 					}
 				}
 			}
 
-			switch(this.state){
-				case 'idle':
-					for(var entity of this.map.entities){
-						if(entity instanceof Farm){
-							if(entity.state === 'unplanted'){
-								if(entity.activeVillager){
-									continue
-								}
-								entity.activeVillager = this
-								this.activeFarm = entity
-								this.goToTile(entity.tile)
-								//this.state = 'planting'
-								return
-							}
-						}
-					}
-
-					if(this.state === 'idle'){
-						var wanderRange = C.VILLAGER_WANDER_RANGE
-						this.goToTile({
-							x: Math.round(this.map.pixelToTile(this.house.pos).x + (Math.random()*2*wanderRange - wanderRange)),
-							y: Math.round(this.map.pixelToTile(this.house.pos).y + (Math.random()*2*wanderRange - wanderRange))
-						})
-					}
-					break
-
-				case 'hungry':
-					if(this.tile.x === this.house.tile.x && this.tile.y === this.house.tile.y){
-						if(this.house.food > 0){
-							this.state = 'idle'
-							this.hungerTimer = C.VILLAGER_HUNGER_TIME
-							this.house.food--
-						}
-					}else{
-						this.goToTile(this.house.tile)
-					}
-			}
+			// Else, wander around near our house
+			this.wander(this.house.pos)
 		}
 	}
 }

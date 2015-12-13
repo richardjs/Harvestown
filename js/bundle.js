@@ -133,7 +133,7 @@
 
 	// Villager parameters
 	exports.VILLAGER_SPEED = 20;
-	exports.VILLAGER_WANDER_RANGE = 10;
+	exports.VILLAGER_WANDER_RANGE = 5;
 	exports.VILLAGER_HUNGER_TIME = 60 * 1000;
 
 	//Farm parameters
@@ -421,6 +421,7 @@
 	var C = __webpack_require__(1);
 	var I = __webpack_require__(4);
 	var Farm = __webpack_require__(11);
+	var House = __webpack_require__(3);
 
 	var Villager = (function () {
 		function Villager(map, house) {
@@ -432,8 +433,10 @@
 			this.angle = 0;
 			this.path = [];
 
-			this.state = 'idle';
+			this.hungry = false;
 			this.hungerTimer = C.VILLAGER_HUNGER_TIME;
+			this.carryingFood = false;
+			this.depot = null;
 
 			this.image = I.VILLAGER;
 
@@ -484,12 +487,21 @@
 				this.setMapTarget(this.path.shift());
 			}
 		}, {
+			key: 'wander',
+			value: function wander(center) {
+				var wanderRange = C.VILLAGER_WANDER_RANGE;
+				this.goToTile({
+					x: Math.round(this.map.pixelToTile(center).x + (Math.random() * 2 * wanderRange - wanderRange)),
+					y: Math.round(this.map.pixelToTile(center).y + (Math.random() * 2 * wanderRange - wanderRange))
+				});
+			}
+		}, {
 			key: 'update',
 			value: function update(delta) {
 				if (this.hungerTimer > 0) {
 					this.hungerTimer -= delta;
 				} else {
-					this.state = 'hungry';
+					this.hungry = true;
 				}
 
 				if (this.pixelTarget) {
@@ -512,74 +524,140 @@
 						this.nextPathNode();
 					}
 				} else {
-					// We've reacher our destination
+					// We're stopped
+
+					// If we're at the farm we were heading to, work it
 					if (this.activeFarm) {
 						if (this.activeFarm.tile.x === this.tile.x && this.activeFarm.tile.y === this.tile.y) {
-							if (this.activeFarm.state === 'unplanted') {
-								this.activeFarm.plant();
+							switch (this.activeFarm.state) {
+								case 'unplanted':
+									this.activeFarm.plant();
+									this.activeFarm = null;
+									break;
+
+								case 'matured':
+									this.depot = null;
+									if (this.house.food < C.HOUSE_MAX_FOOD) {
+										this.depot = this.house;
+									} else {
+										var _iteratorNormalCompletion = true;
+										var _didIteratorError = false;
+										var _iteratorError = undefined;
+
+										try {
+											for (var _iterator = this.map.entities[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+												var entity = _step.value;
+
+												if (entity instanceof House.constructor) {
+													if (entity.food < C.HOUSE_MAX_FOOD) {
+														this.depot = entity;
+														break;
+													}
+												}
+											}
+										} catch (err) {
+											_didIteratorError = true;
+											_iteratorError = err;
+										} finally {
+											try {
+												if (!_iteratorNormalCompletion && _iterator.return) {
+													_iterator.return();
+												}
+											} finally {
+												if (_didIteratorError) {
+													throw _iteratorError;
+												}
+											}
+										}
+									}
+									if (this.depot) {
+										this.activeFarm.harvest();
+										this.activeFarm = null;
+										this.carryingFood = true;
+										this.goToTile(this.depot.tile);
+									} else {
+										this.wander(this.activeFarm.pos);
+										this.activeFarm.activeVillager = null;
+										this.activeFarm = null;
+									}
+									break;
+							}
+						} else {
+							this.goToTile(this.activeFarm.tile);
+							if (this.path.length === 0) {
+								this.activeFarm.activeVillager = null;
 								this.activeFarm = null;
+							}
+						}
+						return;
+					}
+
+					if (this.carryingFood) {
+						if (this.depot.tile.x === this.tile.x && this.depot.tile.y === this.tile.y) {
+							if (this.depot.food < C.HOUSE_MAX_FOOD) {
+								this.depot.food++;
+							}
+						}
+						this.depot = null;
+						this.carryingFood = false;
+						return;
+					}
+
+					// If we're hungry, go home, or eat if we are home
+					if (this.hungry) {
+						if (this.tile.x === this.house.tile.x && this.tile.y === this.house.tile.y) {
+							if (this.house.food > 0) {
+								this.hungry = false;
+								this.hungerTimer = C.VILLAGER_HUNGER_TIME;
+								this.house.food--;
+							}
+						} else {
+							this.goToTile(this.house.tile);
+						}
+						return;
+					}
+
+					// Look for farms to work
+					var _iteratorNormalCompletion2 = true;
+					var _didIteratorError2 = false;
+					var _iteratorError2 = undefined;
+
+					try {
+						for (var _iterator2 = this.map.entities[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+							var entity = _step2.value;
+
+							if (entity instanceof Farm) {
+								if (entity.state === 'unplanted' || entity.state === 'matured') {
+									if (entity.activeVillager) {
+										continue;
+									}
+									entity.activeVillager = this;
+									this.activeFarm = entity;
+									this.goToTile(entity.tile);
+									if (this.path.pixelTarget !== null) {
+										return;
+									}
+								}
+							}
+						}
+
+						// Else, wander around near our house
+					} catch (err) {
+						_didIteratorError2 = true;
+						_iteratorError2 = err;
+					} finally {
+						try {
+							if (!_iteratorNormalCompletion2 && _iterator2.return) {
+								_iterator2.return();
+							}
+						} finally {
+							if (_didIteratorError2) {
+								throw _iteratorError2;
 							}
 						}
 					}
 
-					switch (this.state) {
-						case 'idle':
-							var _iteratorNormalCompletion = true;
-							var _didIteratorError = false;
-							var _iteratorError = undefined;
-
-							try {
-								for (var _iterator = this.map.entities[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-									var entity = _step.value;
-
-									if (entity instanceof Farm) {
-										if (entity.state === 'unplanted') {
-											if (entity.activeVillager) {
-												continue;
-											}
-											entity.activeVillager = this;
-											this.activeFarm = entity;
-											this.goToTile(entity.tile);
-											//this.state = 'planting'
-											return;
-										}
-									}
-								}
-							} catch (err) {
-								_didIteratorError = true;
-								_iteratorError = err;
-							} finally {
-								try {
-									if (!_iteratorNormalCompletion && _iterator.return) {
-										_iterator.return();
-									}
-								} finally {
-									if (_didIteratorError) {
-										throw _iteratorError;
-									}
-								}
-							}
-
-							if (this.state === 'idle') {
-								var wanderRange = C.VILLAGER_WANDER_RANGE;
-								this.goToTile({
-									x: Math.round(this.map.pixelToTile(this.house.pos).x + (Math.random() * 2 * wanderRange - wanderRange)),
-									y: Math.round(this.map.pixelToTile(this.house.pos).y + (Math.random() * 2 * wanderRange - wanderRange))
-								});
-							}
-							break;
-
-						case 'hungry':
-							if (this.tile.x === this.house.tile.x && this.tile.y === this.house.tile.y) {
-								if (this.house.food > 0) {
-									this.state = 'idle';
-									this.hungerTimer = C.VILLAGER_HUNGER_TIME;
-									this.house.food--;
-								}
-							} else {
-								this.goToTile(this.house.tile);
-							}
-					}
+					this.wander(this.house.pos);
 				}
 			}
 		}, {
@@ -1000,6 +1078,14 @@
 				this.state = 'planted';
 				this.growthTimer = this.growthTime;
 				this.image = I.FARM_BARE;
+				this.activeVillager = null;
+			}
+		}, {
+			key: 'harvest',
+			value: function harvest() {
+				this.state = 'unplanted';
+				this.growthTimer = 0;
+				this.image = I.FARM_UNPLANTED;
 				this.activeVillager = null;
 			}
 		}, {
