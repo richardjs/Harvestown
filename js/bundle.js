@@ -270,7 +270,7 @@
 					for (var _iterator2 = this.entities[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
 						var entity = _step2.value;
 
-						if (entity instanceof Villager) {
+						if (entity.type !== 'house') {
 							continue;
 						}
 						firstHouse = false;
@@ -532,11 +532,12 @@
 		}, {
 			key: 'findDepot',
 			value: function findDepot() {
-				var depot;
+				var depot = null;
 				if (this.house.food < C.HOUSE_MAX_FOOD) {
 					depot = this.house;
 				} else {
-					// TODO: prioritize based on proximity
+					var closestDepot = null;
+					var closestDistance = Infinity;
 					var _iteratorNormalCompletion = true;
 					var _didIteratorError = false;
 					var _iteratorError = undefined;
@@ -545,13 +546,11 @@
 						for (var _iterator = this.map.entities[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 							var entity = _step.value;
 
-							if (entity instanceof House.constructor) {
-								if (!entity.built) {
-									continue;
-								}
-								if (entity.food < C.HOUSE_MAX_FOOD) {
-									depot = entity;
-									break;
+							if (entity.type === 'house' && entity.built && entity.food < C.HOUSE_MAX_FOOD) {
+								var distance = this.distanceTo(entity);
+								if (distance < closestDistance) {
+									closestDepot = entity;
+									closestDistance = distance;
 								}
 							}
 						}
@@ -569,8 +568,15 @@
 							}
 						}
 					}
+
+					depot = closestDepot;
 				}
 				return depot;
+			}
+		}, {
+			key: 'distanceTo',
+			value: function distanceTo(entity) {
+				return Math.sqrt(Math.pow(entity.pos.x - this.pos.x, 2) + Math.pow(entity.pos.y - this.pos.y, 2));
 			}
 		}, {
 			key: 'update',
@@ -582,7 +588,7 @@
 					this.hungry = true;
 				}
 
-				// If we're wlaking somewhere, keep going (villagers only respond once they've reached a walking destination)
+				// If we're walking somewhere, keep going
 				if (this.pixelTarget) {
 					var dx = Math.cos(this.angle) * C.VILLAGER_SPEED * delta / 1000;
 					var dy = Math.sin(this.angle) * C.VILLAGER_SPEED * delta / 1000;
@@ -608,7 +614,17 @@
 				// Past here, we've stopped walking, and thus need to make a decision about what to do
 
 				// If we're hungry, go home, or eat if we are home
-				if (this.hungry) {
+				if (this.hungry && !this.carryingLumber && !this.carryingFood) {
+					// Abandon projects so someone else can work on them
+					if (this.activeHouse) {
+						this.activeHouse.activeVillager = null;
+						this.activeHouse = null;
+					}
+					if (this.activeFarm) {
+						this.activeFarm.activeVillager = null;
+						this.activeFarm = null;
+					}
+
 					// If we're at home
 					if (this.tile.x === this.house.tile.x && this.tile.y === this.house.tile.y) {
 						// If we have food, eat it
@@ -620,14 +636,6 @@
 						// Else, become inactive
 						else {
 								this.house.inactive = true;
-								if (this.activeHouse) {
-									this.activeHouse.activeVillager = null;
-									this.activeHouse = null;
-								}
-								if (this.activeFarm) {
-									this.activeFarm.activeVillager = null;
-									this.activeFarm = null;
-								}
 								this.carryingFood = false;
 								this.carryingLumber = false;
 							}
@@ -687,12 +695,20 @@
 					// We're at the depot, drop food off
 					if (this.depot.tile.x === this.tile.x && this.depot.tile.y === this.tile.y) {
 						// Only deposit if depot isn't full
-						// TODO: might be better to find another depot
 						if (this.depot.food < C.HOUSE_MAX_FOOD) {
 							this.depot.food++;
 						}
+						//Else if depot is full, try to find a new one
+						else {
+								var newDepot = this.findDepot();
+								if (newDepot) {
+									this.depot = newDepot;
+									this.goToTile(newDepot.tile);
+									return;
+								}
+							}
 					}
-					// Get rid of food, whether we dropped it off or not (see TD above)
+					// Get rid of food if we're not at the depot (we tried to walk to it and failed)
 					this.depot = null;
 					this.carryingFood = false;
 					return;
@@ -712,8 +728,7 @@
 								this.activeHouse = null;
 							}
 						}
-						// If we're not at the house, forget about it (we can't reach the house?)
-						// TODO figure this out
+						// If we're not at the house, forget about it (we tried to walk to it and failed)
 						else {
 								this.carryingLumber = false;
 								this.activeHouse.activeVillager = null;
@@ -812,7 +827,6 @@
 				}
 				// If we're not buildling a house, see if there's one to work on
 				else {
-						// TODO prioritize this based on proximity
 						var _iteratorNormalCompletion2 = true;
 						var _didIteratorError2 = false;
 						var _iteratorError2 = undefined;
@@ -821,8 +835,17 @@
 							for (var _iterator2 = this.map.entities[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
 								var entity = _step2.value;
 
+								var closestHouse = null;
+								var closestDistance = Infinity;
 								if (entity.type === 'house' && !entity.built && !entity.activeVillager) {
-									this.activeHouse = entity;
+									var distance = this.distanceTo(entity);
+									if (distance < closestDistance) {
+										closestHouse = entity;
+										closestDistance = distance;
+									}
+								}
+								if (closestHouse) {
+									this.activeHouse = closestHouse;
 									this.activeHouse.activeVillager = this;
 									return;
 								}
@@ -844,7 +867,8 @@
 					}
 
 				// Look for farms to work
-				// TODO prioritize this based on proximity (and maybe status--don't get hung up on matured if there's no depots)
+				var closestFarm = null;
+				var closestDistance = Infinity;
 				var _iteratorNormalCompletion3 = true;
 				var _didIteratorError3 = false;
 				var _iteratorError3 = undefined;
@@ -853,28 +877,18 @@
 					for (var _iterator3 = this.map.entities[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
 						var entity = _step3.value;
 
-						if (entity instanceof Farm) {
-							if (entity.state === 'unplanted' || entity.state === 'matured') {
-								if (entity.activeVillager) {
-									continue;
-								}
-								if (entity.state === 'matured' && !this.findDepot()) {
-									continue;
-								}
-								entity.activeVillager = this;
-								this.activeFarm = entity;
-								this.goToTile(entity.tile);
-								if (this.path.pixelTarget !== null) {
-									return;
-								} else {
-									this.activeFarm.activeVillager = null;
-									this.activeFarm = null;
-								}
+						if (entity.type === 'farm' && !entity.activeVillager && (entity.state === 'unplanted' || entity.state === 'matured')) {
+							if (entity.state === 'matured' && !this.findDepot()) {
+								continue;
+							}
+
+							var distance = this.distanceTo(entity);
+							if (distance < closestDistance) {
+								closestFarm = entity;
+								closestDistance = distance;
 							}
 						}
 					}
-
-					// If none of the above applies, wander about the house
 				} catch (err) {
 					_didIteratorError3 = true;
 					_iteratorError3 = err;
@@ -890,6 +904,19 @@
 					}
 				}
 
+				if (closestFarm) {
+					closestFarm.activeVillager = this;
+					this.activeFarm = closestFarm;
+					this.goToTile(closestFarm.tile);
+					if (this.path.pixelTarget !== null) {
+						return;
+					} else {
+						this.activeFarm.activeVillager = null;
+						this.activeFarm = null;
+					}
+				}
+
+				// If none of the above applies, wander about the house
 				this.wander(this.house.pos);
 			}
 		}, {

@@ -78,24 +78,28 @@ class Villager{
 	}
 
 	findDepot(){
-		var depot
+		var depot = null
 		if(this.house.food < C.HOUSE_MAX_FOOD){
 			depot = this.house
 		}else{
-			// TODO: prioritize based on proximity
+			var closestDepot = null
+			var closestDistance = Infinity
 			for(var entity of this.map.entities){
-				if(entity instanceof House.constructor){
-					if(!entity.built){
-						continue
-					}
-					if(entity.food < C.HOUSE_MAX_FOOD){
-						depot = entity
-						break
+				if(entity.type === 'house' && entity.built && entity.food < C.HOUSE_MAX_FOOD){
+					var distance = this.distanceTo(entity)
+					if(distance < closestDistance){
+						closestDepot = entity
+						closestDistance = distance
 					}
 				}
 			}
+			depot = closestDepot
 		}
 		return depot
+	}
+
+	distanceTo(entity){
+		return Math.sqrt(Math.pow(entity.pos.x - this.pos.x, 2) + Math.pow(entity.pos.y - this.pos.y, 2))
 	}
 
 	update(delta){
@@ -106,7 +110,7 @@ class Villager{
 			this.hungry = true
 		}
 
-		// If we're wlaking somewhere, keep going (villagers only respond once they've reached a walking destination)
+		// If we're walking somewhere, keep going
 		if(this.pixelTarget){
 			var dx = Math.cos(this.angle) * C.VILLAGER_SPEED * delta/1000
 			var dy = Math.sin(this.angle) * C.VILLAGER_SPEED * delta/1000
@@ -132,7 +136,17 @@ class Villager{
 		// Past here, we've stopped walking, and thus need to make a decision about what to do
 		
 		// If we're hungry, go home, or eat if we are home
-		if(this.hungry){
+		if(this.hungry && !this.carryingLumber && !this.carryingFood){
+			// Abandon projects so someone else can work on them
+			if(this.activeHouse){
+				this.activeHouse.activeVillager = null
+				this.activeHouse = null
+			}
+			if(this.activeFarm){
+				this.activeFarm.activeVillager = null
+				this.activeFarm = null
+			}
+
 			// If we're at home
 			if(this.tile.x === this.house.tile.x && this.tile.y === this.house.tile.y){
 				// If we have food, eat it
@@ -144,14 +158,6 @@ class Villager{
 				// Else, become inactive
 				else{
 					this.house.inactive = true
-					if(this.activeHouse){
-						this.activeHouse.activeVillager = null
-						this.activeHouse = null
-					}
-					if(this.activeFarm){
-						this.activeFarm.activeVillager = null
-						this.activeFarm = null
-					}
 					this.carryingFood = false
 					this.carryingLumber = false
 				}
@@ -211,12 +217,20 @@ class Villager{
 			// We're at the depot, drop food off
 			if(this.depot.tile.x === this.tile.x && this.depot.tile.y === this.tile.y){
 				// Only deposit if depot isn't full
-				// TODO: might be better to find another depot
 				if(this.depot.food < C.HOUSE_MAX_FOOD){
 					this.depot.food++
 				}
+				//Else if depot is full, try to find a new one
+				else{
+					var newDepot = this.findDepot()
+					if(newDepot){
+						this.depot = newDepot
+						this.goToTile(newDepot.tile)
+						return
+					}
+				}
 			}
-			// Get rid of food, whether we dropped it off or not (see TD above)
+			// Get rid of food if we're not at the depot (we tried to walk to it and failed)
 			this.depot = null
 			this.carryingFood = false
 			return
@@ -236,8 +250,7 @@ class Villager{
 						this.activeHouse = null
 					}
 				}
-				// If we're not at the house, forget about it (we can't reach the house?)
-				// TODO figure this out
+				// If we're not at the house, forget about it (we tried to walk to it and failed)
 				else{
 					this.carryingLumber = false
 					this.activeHouse.activeVillager = null
@@ -336,10 +349,18 @@ class Villager{
 		}
 		// If we're not buildling a house, see if there's one to work on
 		else{
-			// TODO prioritize this based on proximity
 			for(var entity of this.map.entities){
+				var closestHouse = null
+				var closestDistance = Infinity
 				if(entity.type === 'house' && !entity.built && !entity.activeVillager){
-					this.activeHouse = entity
+					var distance = this.distanceTo(entity)
+					if(distance < closestDistance){
+						closestHouse = entity
+						closestDistance = distance
+					}
+				}
+				if(closestHouse){
+					this.activeHouse = closestHouse
 					this.activeHouse.activeVillager = this
 					return
 				}
@@ -347,26 +368,30 @@ class Villager{
 		}
 
 		// Look for farms to work
-		// TODO prioritize this based on proximity (and maybe status--don't get hung up on matured if there's no depots)
+		var closestFarm = null
+		var closestDistance = Infinity
 		for(var entity of this.map.entities){
-			if(entity instanceof Farm){
-				if(entity.state === 'unplanted' || entity.state === 'matured'){
-					if(entity.activeVillager){
-						continue
-					}
-					if(entity.state === 'matured' && !this.findDepot()){
-						continue
-					}
-					entity.activeVillager = this
-					this.activeFarm = entity
-					this.goToTile(entity.tile)
-					if(this.path.pixelTarget !== null){
-						return
-					}else{
-						this.activeFarm.activeVillager = null
-						this.activeFarm = null
-					}
+			if(entity.type === 'farm' && !entity.activeVillager && (entity.state === 'unplanted' || entity.state === 'matured')){
+				if(entity.state === 'matured' && !this.findDepot()){
+					continue
 				}
+
+				var distance = this.distanceTo(entity)
+				if(distance < closestDistance){
+					closestFarm = entity
+					closestDistance = distance
+				}
+			}
+		}
+		if(closestFarm){
+			closestFarm.activeVillager = this
+			this.activeFarm = closestFarm
+			this.goToTile(closestFarm.tile)
+			if(this.path.pixelTarget !== null){
+				return
+			}else{
+				this.activeFarm.activeVillager = null
+				this.activeFarm = null
 			}
 		}
 
