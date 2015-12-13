@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 744.09448819 1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="villager_lumber.svg"
+   inkscape:export-filename="C:\Users\Richard\code\ld34\img\villager.png"
+   inkscape:export-xdpi="13.846154"
+   inkscape:export-ydpi="13.846154">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.979899"
+     inkscape:cx="-130.64109"
+     inkscape:cy="-26.509257"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1028"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid4136" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       sodipodi:nodetypes="cccccc"
+       inkscape:connector-curvature="0"
+       id="path4150"
+       d="m 104,1022.3622 0,-24.28571 9.28571,-5.71429 10.71429,5.35714 0,24.64286 z"
+       style="fill:#f9a772;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\player.png"
+       inkscape:export-xdpi="36"
+       inkscape:export-ydpi="36" />
+    <path
+       style="fill:#f9a772;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 1,1022.3622 1,998.07649 10.28571,992.3622 21,997.71934 l 0,24.64286 z"
+       id="path4148"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccccc"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\player.png"
+       inkscape:export-xdpi="36"
+       inkscape:export-ydpi="36" />
+    <rect
+       style="fill:#2b1100;fill-opacity:1;stroke:none"
+       id="rect8040"
+       width="125"
+       height="15"
+       x="0"
+       y="992.36218" />
+    <path
+       style="fill:#502d16;fill-rule:evenodd;stroke:#a14600;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 0,995.3622 125,0"
+       id="path8042"
+       inkscape:connector-curvature="0" />
+    <ellipse
+       style="fill:#9e0002;fill-opacity:1"
+       id="path4142"
+       cx="62.5"
+       cy="1021.4782"
+       rx="62.5"
+       ry="17.51115"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\player.png"
+       inkscape:export-xdpi="36"
+       inkscape:export-ydpi="36" />
+    <path
+       style="fill:#01015b;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 32,1036.9617 0,-30.7359 -6.13642,0.7576 0,29.1161 z"
+       id="path4152"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\player.png"
+       inkscape:export-xdpi="36"
+       inkscape:export-ydpi="36" />
+    <path
+       style="fill:#502d16;fill-rule:evenodd;stroke:#a14600;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 0,1003.3724 125,0"
+       id="path8046"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:#502d16;fill-rule:evenodd;stroke:#a14600;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 0,1000.2622 125,-0.99994"
+       id="path8044"
+       inkscape:connector-curvature="0" />
+    <circle
+       style="fill:#501616;fill-opacity:1"
+       id="path4140"
+       cx="62.5"
+       cy="1019.8622"
+       r="27.5"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\player.png"
+       inkscape:export-xdpi="36"
+       inkscape:export-ydpi="36" />
+    <path
+       sodipodi:nodetypes="ccccc"
+       inkscape:connector-curvature="0"
+       id="path4154"
+       d="m 93.12627,1036.9617 0,-30.7359 6.6415,0.7576 0,29.1161 z"
+       style="fill:#01015b;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\player.png"
+       inkscape:export-xdpi="36"
+       inkscape:export-ydpi="36" />
+    <path
+       style="fill:#501616;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 65,997.3622 5,-10 5,10 10,0 -5,5 10,5 -5,5 10,5 -10,10 5,10 -10,0 0,10 -10,-5 -10,10 -5,-10 -10,5 5,-10 -15,0 5,-10 -10,-5 10,-5 -5,-10 15,-5 -5,-10 10,5 5,-10 z"
+       id="path4144"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\Users\Richard\code\ld34\img\player.png"
+       inkscape:export-xdpi="36"
+       inkscape:export-ydpi="36" />
+  </g>
+</svg>

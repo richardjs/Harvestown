@@ -103,6 +103,12 @@ class Villager{
 	}
 
 	update(delta){
+		if(this.carryingLumber){
+			this.image = I.VILLAGER_LUMBER
+		}else{
+			this.image = I.VILLAGER
+		}
+
 		// Grow hungry
 		if(this.hungerTimer > 0){
 			this.hungerTimer -= delta
