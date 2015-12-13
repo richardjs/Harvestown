@@ -20,6 +20,7 @@ exports.FARM_WATER_REDUCTION = exports.FARM_GROWTH_TIME*.1
 // House parameters
 exports.HOUSE_STARTING_FOOD = 3
 exports.HOUSE_MAX_FOOD = 5
+exports.HOUSE_REQUIRED_LUMBER = 5
 
 // Technical map generation parameters
 exports.WATER_CELL_RANDOM_START_CHANCE = .47

@@ -143,6 +143,7 @@
 	// House parameters
 	exports.HOUSE_STARTING_FOOD = 3;
 	exports.HOUSE_MAX_FOOD = 5;
+	exports.HOUSE_REQUIRED_LUMBER = 5;
 
 	// Technical map generation parameters
 	exports.WATER_CELL_RANDOM_START_CHANCE = .47;
@@ -268,7 +269,7 @@
 					for (var _iterator2 = this.entities[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
 						var entity = _step2.value;
 
-						if (!(entity instanceof House)) {
+						if (entity instanceof Villager) {
 							continue;
 						}
 						firstHouse = false;
@@ -346,21 +347,46 @@
 		function House(map, pos, startingHouse) {
 			_classCallCheck(this, House);
 
+			this.type = 'house';
 			this.map = map;
 			this.pos = pos;
-			this.image = I.HOUSE;
+			this.image = I.HOUSE_FOUNDATION;
+
+			this.lumber = 0;
 
 			this.food = 0;
 			if (startingHouse) {
+				this.lumber = C.HOUSE_REQUIRED_LUMBER;
 				this.food = C.HOUSE_STARTING_FOOD;
+				this.image = I.HOUSE;
+				this.spawnVillager();
 			}
 
-			this.map.entities.push(new Villager(this.map, this));
+			this.activeVillager = null;
 		}
 
 		_createClass(House, [{
+			key: 'build',
+			value: function build() {
+				this.lumber++;
+				if (this.built) {
+					this.image = I.HOUSE;
+					this.spawnVillager();
+				}
+			}
+		}, {
+			key: 'spawnVillager',
+			value: function spawnVillager() {
+				this.map.entities.push(new Villager(this.map, this));
+			}
+		}, {
 			key: 'update',
 			value: function update() {}
+		}, {
+			key: 'built',
+			get: function get() {
+				return this.lumber === C.HOUSE_REQUIRED_LUMBER;
+			}
 		}, {
 			key: 'tile',
 			get: function get() {
@@ -384,6 +410,8 @@
 
 	exports.HOUSE = new Image();
 	exports.HOUSE.src = __webpack_require__(6);
+	exports.HOUSE_FOUNDATION = new Image();
+	exports.HOUSE_FOUNDATION.src = __webpack_require__(16);
 
 	exports.FARM_UNPLANTED = new Image();
 	exports.FARM_UNPLANTED.src = __webpack_require__(12);
@@ -427,6 +455,7 @@
 		function Villager(map, house) {
 			_classCallCheck(this, Villager);
 
+			this.type = 'villager';
 			this.map = map;
 			this.house = house;
 			this.pos = { x: house.pos.x, y: house.pos.y };
@@ -442,6 +471,7 @@
 
 			this.pixelTarget = null;
 			this.activeFarm = null;
+			this.activeHouse = null;
 		}
 
 		_createClass(Villager, [{
@@ -549,6 +579,9 @@
 												var entity = _step.value;
 
 												if (entity instanceof House.constructor) {
+													if (!entity.built) {
+														continue;
+													}
 													if (entity.food < C.HOUSE_MAX_FOOD) {
 														this.depot = entity;
 														break;
@@ -617,20 +650,145 @@
 						return;
 					}
 
+					if (this.activeHouse) {
+						if (this.carryingLumber) {
+							if (this.tile.x === this.activeHouse.tile.x && this.tile.y === this.activeHouse.tile.y) {
+								this.activeHouse.build();
+								this.carryingLumber = false;
+								if (this.activeHouse.built) {
+									this.activeHouse.activeVillager = null;
+									this.activeHouse = null;
+								}
+							} else {
+								this.carryingLumber = false;
+								this.activeHouse.activeVillager = null;
+								this.activeHouse = null;
+							}
+							return;
+						} else {
+							// If standing next to a tree, cut it down
+							var tree = null;
+							if (map.at({ x: this.tile.x - 1, y: this.tile.y - 1 }) === 'tree') tree = { x: this.tile.x - 1, y: this.tile.y - 1 };
+							if (map.at({ x: this.tile.x - 1, y: this.tile.y + 1 }) === 'tree') tree = { x: this.tile.x - 1, y: this.tile.y + 1 };
+							if (map.at({ x: this.tile.x + 1, y: this.tile.y - 1 }) === 'tree') tree = { x: this.tile.x + 1, y: this.tile.y - 1 };
+							if (map.at({ x: this.tile.x + 1, y: this.tile.y + 1 }) === 'tree') tree = { x: this.tile.x + 1, y: this.tile.y + 1 };
+							if (map.at({ x: this.tile.x - 1, y: this.tile.y }) === 'tree') tree = { x: this.tile.x - 1, y: this.tile.y };
+							if (map.at({ x: this.tile.x + 1, y: this.tile.y }) === 'tree') tree = { x: this.tile.x + 1, y: this.tile.y };
+							if (map.at({ x: this.tile.x, y: this.tile.y - 1 }) === 'tree') tree = { x: this.tile.x, y: this.tile.y - 1 };
+							if (map.at({ x: this.tile.x, y: this.tile.y + 1 }) === 'tree') tree = { x: this.tile.x, y: this.tile.y + 1 };
+							if (tree) {
+								map.data[tree.x][tree.y] = undefined;
+								view.updateTileImage(tree);
+								this.carryingLumber = true;
+								this.goToTile(this.activeHouse.tile);
+								return;
+							}
+
+							// Search for a tree nearby
+							var crumbs = [];
+							var queue = [this.tile];
+							while (queue.length) {
+								var tile = queue.shift();
+								if (map.at(tile) === 'tree') {
+									break;
+								}
+								if (map.at(tile) !== undefined) {
+									continue;
+								}
+
+								if (crumbs[tile.x] === undefined) {
+									crumbs[tile.x] = [];
+								}
+								if (crumbs[tile.x - 1] === undefined) {
+									crumbs[tile.x - 1] = [];
+								}
+								if (crumbs[tile.x + 1] === undefined) {
+									crumbs[tile.x + 1] = [];
+								}
+								crumbs[tile.x][tile.y] = true;
+
+								if (!crumbs[tile.x - 1][tile.y]) {
+									queue.push({ x: tile.x - 1, y: tile.y, prev: tile });
+									crumbs[tile.x - 1][tile.y] = true;
+								}
+								if (!crumbs[tile.x + 1][tile.y]) {
+									queue.push({ x: tile.x + 1, y: tile.y, prev: tile });
+									crumbs[tile.x + 1][tile.y] = true;
+								}
+								if (!crumbs[tile.x][tile.y - 1]) {
+									queue.push({ x: tile.x, y: tile.y - 1, prev: tile });
+									crumbs[tile.x][tile.y - 1] = true;
+								}
+								if (!crumbs[tile.x][tile.y + 1]) {
+									queue.push({ x: tile.x, y: tile.y + 1, prev: tile });
+									crumbs[tile.x][tile.y + 1] = true;
+								}
+								if (!crumbs[tile.x - 1][tile.y - 1]) {
+									queue.push({ x: tile.x - 1, y: tile.y - 1, prev: tile });
+									crumbs[tile.x - 1][tile.y - 1] = true;
+								}
+								if (!crumbs[tile.x - 1][tile.y + 1]) {
+									queue.push({ x: tile.x - 1, y: tile.y + 1, prev: tile });
+									crumbs[tile.x - 1][tile.y + 1] = true;
+								}
+								if (!crumbs[tile.x + 1][tile.y - 1]) {
+									queue.push({ x: tile.x + 1, y: tile.y - 1, prev: tile });
+									crumbs[tile.x + 1][tile.y - 1] = true;
+								}
+								if (!crumbs[tile.x + 1][tile.y + 1]) {
+									queue.push({ x: tile.x + 1, y: tile.y + 1, prev: tile });
+									crumbs[tile.x + 1][tile.y + 1] = true;
+								}
+							}
+							this.goToTile(tile.prev);
+							return;
+						}
+					} else {
+						var _iteratorNormalCompletion2 = true;
+						var _didIteratorError2 = false;
+						var _iteratorError2 = undefined;
+
+						try {
+							for (var _iterator2 = this.map.entities[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+								var entity = _step2.value;
+
+								if (entity.type === 'house' && !entity.built && !entity.activeVillager) {
+									this.activeHouse = entity;
+									this.activeHouse.activeVillager = this;
+									return;
+								}
+							}
+						} catch (err) {
+							_didIteratorError2 = true;
+							_iteratorError2 = err;
+						} finally {
+							try {
+								if (!_iteratorNormalCompletion2 && _iterator2.return) {
+									_iterator2.return();
+								}
+							} finally {
+								if (_didIteratorError2) {
+									throw _iteratorError2;
+								}
+							}
+						}
+					}
+
 					// Look for farms to work
-					var _iteratorNormalCompletion2 = true;
-					var _didIteratorError2 = false;
-					var _iteratorError2 = undefined;
+					var _iteratorNormalCompletion3 = true;
+					var _didIteratorError3 = false;
+					var _iteratorError3 = undefined;
 
 					try {
-						for (var _iterator2 = this.map.entities[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-							var entity = _step2.value;
+						for (var _iterator3 = this.map.entities[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+							var entity = _step3.value;
 
 							if (entity instanceof Farm) {
 								if (entity.state === 'unplanted' || entity.state === 'matured') {
 									if (entity.activeVillager) {
 										continue;
 									}
+									console.log('farming');
 									entity.activeVillager = this;
 									this.activeFarm = entity;
 									this.goToTile(entity.tile);
@@ -643,16 +801,16 @@
 
 						// Else, wander around near our house
 					} catch (err) {
-						_didIteratorError2 = true;
-						_iteratorError2 = err;
+						_didIteratorError3 = true;
+						_iteratorError3 = err;
 					} finally {
 						try {
-							if (!_iteratorNormalCompletion2 && _iterator2.return) {
-								_iterator2.return();
+							if (!_iteratorNormalCompletion3 && _iterator3.return) {
+								_iterator3.return();
 							}
 						} finally {
-							if (_didIteratorError2) {
-								throw _iteratorError2;
+							if (_didIteratorError3) {
+								throw _iteratorError3;
 							}
 						}
 					}
@@ -795,12 +953,14 @@
 				var _iteratorError3 = undefined;
 
 				try {
-					for (var _iterator3 = villagers[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+					for (var _iterator3 = houses[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
 						var entity = _step3.value;
 
+						if (entity.built) {
+							continue;
+						}
 						this.ctx.save();
 						this.ctx.translate(entity.pos.x - this.offset.x, entity.pos.y - this.offset.y);
-						this.ctx.rotate(entity.angle);
 						this.ctx.drawImage(entity.image, -entity.image.width / 2, -entity.image.height / 2);
 						this.ctx.restore();
 					}
@@ -824,9 +984,41 @@
 				var _iteratorError4 = undefined;
 
 				try {
-					for (var _iterator4 = houses[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+					for (var _iterator4 = villagers[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
 						var entity = _step4.value;
 
+						this.ctx.save();
+						this.ctx.translate(entity.pos.x - this.offset.x, entity.pos.y - this.offset.y);
+						this.ctx.rotate(entity.angle);
+						this.ctx.drawImage(entity.image, -entity.image.width / 2, -entity.image.height / 2);
+						this.ctx.restore();
+					}
+				} catch (err) {
+					_didIteratorError4 = true;
+					_iteratorError4 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion4 && _iterator4.return) {
+							_iterator4.return();
+						}
+					} finally {
+						if (_didIteratorError4) {
+							throw _iteratorError4;
+						}
+					}
+				}
+
+				var _iteratorNormalCompletion5 = true;
+				var _didIteratorError5 = false;
+				var _iteratorError5 = undefined;
+
+				try {
+					for (var _iterator5 = houses[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+						var entity = _step5.value;
+
+						if (!entity.built) {
+							continue;
+						}
 						this.ctx.save();
 						this.ctx.translate(entity.pos.x - this.offset.x, entity.pos.y - this.offset.y);
 						this.ctx.drawImage(entity.image, -entity.image.width / 2, -entity.image.height / 2);
@@ -845,16 +1037,16 @@
 						this.ctx.restore();
 					}
 				} catch (err) {
-					_didIteratorError4 = true;
-					_iteratorError4 = err;
+					_didIteratorError5 = true;
+					_iteratorError5 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion4 && _iterator4.return) {
-							_iterator4.return();
+						if (!_iteratorNormalCompletion5 && _iterator5.return) {
+							_iterator5.return();
 						}
 					} finally {
-						if (_didIteratorError4) {
-							throw _iteratorError4;
+						if (_didIteratorError5) {
+							throw _iteratorError5;
 						}
 					}
 				}
@@ -882,11 +1074,33 @@
 			}
 		}, {
 			key: 'updateTileImage',
-			value: function updateTileImage() {
+			value: function updateTileImage(onlyPos) {
+				if (onlyPos) {
+					switch (this.map.data[onlyPos.x][onlyPos.y]) {
+						case 'water':
+							this.tileCtx.fillStyle = '#008';
+							break;
+						case 'tree':
+							this.tileCtx.fillStyle = '#040';
+							break;
+						default:
+							this.tileCtx.fillStyle = '#171';
+					}
+					this.tileCtx.fillRect(onlyPos.x * this.map.tileWidth, onlyPos.y * this.map.tileHeight, this.map.tileWidth, this.map.tileHeight);
+					this.tileCtx.strokeStyle = '#040';
+					this.tileCtx.lineWidth = .5;
+					this.tileCtx.strokeRect(onlyPos.x * this.map.tileWidth, onlyPos.y * this.map.tileHeight, this.map.tileWidth, this.map.tileHeight);
+					this.tileImage = new Image();
+					this.tileImage.src = this.tileCanvas.toDataURL();
+					return;
+				}
+
 				var canvas = document.createElement('canvas');
 				var ctx = canvas.getContext('2d');
 				canvas.width = this.map.width * this.map.tileWidth;
 				canvas.height = this.map.height * this.map.tileHeight;
+				this.tileCanvas = canvas;
+				this.tileCtx = ctx;
 
 				for (var x = 0; x < this.map.width; x++) {
 					for (var y = 0; y < this.map.height; y++) {
@@ -1048,6 +1262,7 @@
 		function Farm(map, pos) {
 			_classCallCheck(this, Farm);
 
+			this.type = 'farm';
 			this.map = map;
 			this.pos = pos;
 			this.image = I.FARM_UNPLANTED;
@@ -1146,6 +1361,12 @@
 /***/ function(module, exports) {
 
 	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAEUwAABFMBAq/upQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABySURBVDiNY1TkY/ivIcjIoCHEwPD+JxPD259MDFde/2YgRUxTiIHh7U8mhrc/mRmYGKgM4AbuMvyPIUms2E4kMbiBbucZMRQSK+aOJAY38K4khjqyxGgXhsrPMSXJERuNFMrBaKSggtFIwSlGn0ihFgAAEWJinCaBnjMAAAAASUVORK5CYII="
+
+/***/ },
+/* 16 */
+/***/ function(module, exports) {
+
+	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAARCAYAAAA/mJfHAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAEWwAABFsBJiXmwAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABISURBVDiNY3RxcbljYGDAwUAhuHDhwg8WPT09Dnt7e2lKDfv3799TJkoNQQajho0aNmrYCDCM5dKlSz+YmJieUmrQpUuXfgAA3lwS3jbbLEgAAAAASUVORK5CYII="
 
 /***/ }
 /******/ ]);

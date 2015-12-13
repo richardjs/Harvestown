@@ -69,6 +69,19 @@ class View{
 			this.ctx.restore()
 		}
 
+		for(var entity of houses){
+			if(entity.built){
+				continue
+			}
+			this.ctx.save()
+			this.ctx.translate(
+				entity.pos.x - this.offset.x,
+				entity.pos.y - this.offset.y
+			)
+			this.ctx.drawImage(entity.image, -entity.image.width/2, -entity.image.height/2)
+			this.ctx.restore()
+		}
+
 		for(var entity of villagers){
 			this.ctx.save()
 			this.ctx.translate(
@@ -81,6 +94,9 @@ class View{
 		}
 
 		for(var entity of houses){
+			if(!entity.built){
+				continue
+			}
 			this.ctx.save()
 			this.ctx.translate(
 				entity.pos.x - this.offset.x,
@@ -123,11 +139,33 @@ class View{
 		this.ctx.drawImage(this.tileImage, -this.offset.x, -this.offset.y)
 	}
 
-	updateTileImage(){
+	updateTileImage(onlyPos){
+		if(onlyPos){
+			switch(this.map.data[onlyPos.x][onlyPos.y]){
+				case 'water':
+					this.tileCtx.fillStyle = '#008'
+					break
+				case 'tree':
+					this.tileCtx.fillStyle = '#040'
+					break
+				default:
+					this.tileCtx.fillStyle = '#171'
+			}
+			this.tileCtx.fillRect(onlyPos.x*this.map.tileWidth, onlyPos.y*this.map.tileHeight, this.map.tileWidth, this.map.tileHeight)
+			this.tileCtx.strokeStyle = '#040'
+			this.tileCtx.lineWidth = .5
+			this.tileCtx.strokeRect(onlyPos.x*this.map.tileWidth, onlyPos.y*this.map.tileHeight, this.map.tileWidth, this.map.tileHeight)
+			this.tileImage = new Image()
+			this.tileImage.src = this.tileCanvas.toDataURL()
+			return
+		}
+
 		var canvas = document.createElement('canvas')
 		var ctx = canvas.getContext('2d')
 		canvas.width = this.map.width * this.map.tileWidth
 		canvas.height = this.map.height * this.map.tileHeight
+		this.tileCanvas = canvas
+		this.tileCtx = ctx
 
 		for(var x = 0; x < this.map.width; x++){
 			for(var y = 0; y < this.map.height; y++){

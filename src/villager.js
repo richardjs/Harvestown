@@ -7,6 +7,7 @@ var House = require('./house.js')
 
 class Villager{
 	constructor(map, house){
+		this.type = 'villager'
 		this.map = map
 		this.house = house
 		this.pos = {x: house.pos.x, y: house.pos.y}
@@ -22,6 +23,7 @@ class Villager{
 
 		this.pixelTarget = null
 		this.activeFarm = null
+		this.activeHouse = null
 	}
 
 	get tile(){
@@ -120,6 +122,9 @@ class Villager{
 							}else{
 								for(var entity of this.map.entities){
 									if(entity instanceof House.constructor){
+										if(!entity.built){
+											continue
+										}
 										if(entity.food < C.HOUSE_MAX_FOOD){
 											this.depot = entity
 											break
@@ -174,6 +179,109 @@ class Villager{
 				return
 			}
 
+			if(this.activeHouse){
+				if(this.carryingLumber){
+					if(this.tile.x === this.activeHouse.tile.x && this.tile.y === this.activeHouse.tile.y){
+						this.activeHouse.build()
+						this.carryingLumber = false
+						if(this.activeHouse.built){
+							this.activeHouse.activeVillager = null
+							this.activeHouse = null
+						}
+					}else{
+						this.carryingLumber = false
+						this.activeHouse.activeVillager = null
+						this.activeHouse = null
+					}
+					return
+				}else{
+					// If standing next to a tree, cut it down
+					var tree = null
+					if(map.at({x: this.tile.x - 1, y: this.tile.y - 1}) === 'tree') tree = {x: this.tile.x-1, y: this.tile.y-1} 
+					if(map.at({x: this.tile.x - 1, y: this.tile.y + 1}) === 'tree') tree = {x: this.tile.x-1, y: this.tile.y+1}
+					if(map.at({x: this.tile.x + 1, y: this.tile.y - 1}) === 'tree') tree = {x: this.tile.x+1, y: this.tile.y-1}
+					if(map.at({x: this.tile.x + 1, y: this.tile.y + 1}) === 'tree') tree = {x: this.tile.x+1, y: this.tile.y+1}
+					if(map.at({x: this.tile.x - 1, y: this.tile.y}) === 'tree') tree = {x: this.tile.x-1, y: this.tile.y}
+					if(map.at({x: this.tile.x + 1, y: this.tile.y}) === 'tree') tree = {x: this.tile.x+1, y: this.tile.y}
+					if(map.at({x: this.tile.x, y: this.tile.y - 1}) === 'tree') tree = {x: this.tile.x, y: this.tile.y-1}
+					if(map.at({x: this.tile.x, y: this.tile.y + 1}) === 'tree') tree = {x: this.tile.x, y: this.tile.y+1}
+					if(tree){
+						map.data[tree.x][tree.y] = undefined
+						view.updateTileImage(tree)
+						this.carryingLumber = true
+						this.goToTile(this.activeHouse.tile)
+						return
+					}
+
+					// Search for a tree nearby
+					var crumbs = []
+					var queue = [this.tile]
+					while(queue.length){
+						var tile = queue.shift()
+						if(map.at(tile) === 'tree'){
+							break;
+						}
+						if(map.at(tile) !== undefined){
+							continue;
+						}
+
+						if(crumbs[tile.x] === undefined){
+							crumbs[tile.x] = []
+						}
+						if(crumbs[tile.x-1] === undefined){
+							crumbs[tile.x-1] = []
+						}
+						if(crumbs[tile.x+1] === undefined){
+							crumbs[tile.x+1] = []
+						}
+						crumbs[tile.x][tile.y] = true
+						
+						if(!crumbs[tile.x-1][tile.y]){
+							queue.push({x: tile.x-1, y: tile.y, prev: tile})
+							crumbs[tile.x-1][tile.y] = true
+						}
+						if(!crumbs[tile.x+1][tile.y]){
+							queue.push({x: tile.x+1, y: tile.y, prev: tile})
+							crumbs[tile.x+1][tile.y] = true
+						}
+						if(!crumbs[tile.x][tile.y-1]){
+							queue.push({x: tile.x, y: tile.y-1, prev: tile})
+							crumbs[tile.x][tile.y-1] = true
+						}
+						if(!crumbs[tile.x][tile.y+1]){
+							queue.push({x: tile.x, y: tile.y+1, prev: tile})
+							crumbs[tile.x][tile.y+1] = true
+						}
+						if(!crumbs[tile.x-1][tile.y-1]){
+							queue.push({x: tile.x-1, y: tile.y-1, prev: tile})
+							crumbs[tile.x-1][tile.y-1] = true
+						}
+						if(!crumbs[tile.x-1][tile.y+1]){
+							queue.push({x: tile.x-1, y: tile.y+1, prev: tile})
+							crumbs[tile.x-1][tile.y+1] = true
+						}
+						if(!crumbs[tile.x+1][tile.y-1]){
+							queue.push({x: tile.x+1, y: tile.y-1, prev: tile})
+							crumbs[tile.x+1][tile.y-1] = true
+						}
+						if(!crumbs[tile.x+1][tile.y+1]){
+							queue.push({x: tile.x+1, y: tile.y+1, prev: tile})
+							crumbs[tile.x+1][tile.y+1] = true
+						}
+					}
+					this.goToTile(tile.prev)
+					return
+				}
+			}else{
+				for(var entity of this.map.entities){
+					if(entity.type === 'house' && !entity.built && !entity.activeVillager){
+						this.activeHouse = entity
+						this.activeHouse.activeVillager = this
+						return
+					}
+				}
+			}
+
 			// Look for farms to work
 			for(var entity of this.map.entities){
 				if(entity instanceof Farm){
@@ -181,6 +289,7 @@ class Villager{
 						if(entity.activeVillager){
 							continue
 						}
+						console.log('farming')
 						entity.activeVillager = this
 						this.activeFarm = entity
 						this.goToTile(entity.tile)

@@ -68,7 +68,7 @@ class Map{
 		}
 		var firstHouse = true
 		for(var entity of this.entities){
-			if(!(entity instanceof House)){
+			if(entity instanceof Villager){
 				continue
 			}
 			firstHouse = false

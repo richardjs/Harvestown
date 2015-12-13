@@ -5,6 +5,7 @@ var I = require('./image.js')
 
 class Farm{
 	constructor(map, pos){
+		this.type = 'farm'
 		this.map = map
 		this.pos = pos
 		this.image = I.FARM_UNPLANTED
