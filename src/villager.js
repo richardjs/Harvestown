@@ -207,7 +207,7 @@ class Villager{
 					if(map.at({x: this.tile.x, y: this.tile.y + 1}) === 'tree') tree = {x: this.tile.x, y: this.tile.y+1}
 					if(tree){
 						map.data[tree.x][tree.y] = undefined
-						view.updateTileImage(tree)
+						map.removedTrees.push(tree)
 						this.carryingLumber = true
 						this.goToTile(this.activeHouse.tile)
 						return

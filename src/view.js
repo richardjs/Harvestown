@@ -42,6 +42,13 @@ class View{
 
 	render(){
 		this.renderTiles()
+		for(var tree of this.map.removedTrees){
+			this.ctx.fillStyle = '#171'
+			this.ctx.fillRect(tree.x*this.map.tileWidth - this.offset.x, tree.y*this.map.tileHeight - this.offset.y, this.map.tileWidth, this.map.tileHeight)
+			this.ctx.strokeStyle = '#040'
+			this.ctx.lineWidth = .5
+			this.ctx.strokeRect(tree.x*this.map.tileWidth - this.offset.x, tree.y*this.map.tileHeight - this.offset.y , this.map.tileWidth, this.map.tileHeight)
+		}
 
 		var farms = []
 		var villagers = []

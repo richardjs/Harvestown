@@ -15,6 +15,7 @@ class Map{
 		this.generateGeography()
 
 		this.entities = []
+		this.removedTrees = []
 	}
 
 	generateGeography(){

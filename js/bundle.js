@@ -181,6 +181,7 @@
 			this.generateGeography();
 
 			this.entities = [];
+			this.removedTrees = [];
 		}
 
 		_createClass(Map, [{
@@ -678,7 +679,7 @@
 							if (map.at({ x: this.tile.x, y: this.tile.y + 1 }) === 'tree') tree = { x: this.tile.x, y: this.tile.y + 1 };
 							if (tree) {
 								map.data[tree.x][tree.y] = undefined;
-								view.updateTileImage(tree);
+								map.removedTrees.push(tree);
 								this.carryingLumber = true;
 								this.goToTile(this.activeHouse.tile);
 								return;
@@ -884,26 +885,19 @@
 			key: 'render',
 			value: function render() {
 				this.renderTiles();
-
-				var farms = [];
-				var villagers = [];
-				var houses = [];
 				var _iteratorNormalCompletion = true;
 				var _didIteratorError = false;
 				var _iteratorError = undefined;
 
 				try {
-					for (var _iterator = this.map.entities[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-						var entity = _step.value;
+					for (var _iterator = this.map.removedTrees[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+						var tree = _step.value;
 
-						if (entity instanceof Farm) {
-							farms.push(entity);
-						} else if (entity instanceof Villager) {
-							villagers.push(entity);
-						} else if (entity instanceof House) {
-							houses.push(entity);
-							continue;
-						}
+						this.ctx.fillStyle = '#171';
+						this.ctx.fillRect(tree.x * this.map.tileWidth - this.offset.x, tree.y * this.map.tileHeight - this.offset.y, this.map.tileWidth, this.map.tileHeight);
+						this.ctx.strokeStyle = '#040';
+						this.ctx.lineWidth = .5;
+						this.ctx.strokeRect(tree.x * this.map.tileWidth - this.offset.x, tree.y * this.map.tileHeight - this.offset.y, this.map.tileWidth, this.map.tileHeight);
 					}
 				} catch (err) {
 					_didIteratorError = true;
@@ -920,18 +914,25 @@
 					}
 				}
 
+				var farms = [];
+				var villagers = [];
+				var houses = [];
 				var _iteratorNormalCompletion2 = true;
 				var _didIteratorError2 = false;
 				var _iteratorError2 = undefined;
 
 				try {
-					for (var _iterator2 = farms[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+					for (var _iterator2 = this.map.entities[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
 						var entity = _step2.value;
 
-						this.ctx.save();
-						this.ctx.translate(entity.pos.x - this.offset.x, entity.pos.y - this.offset.y);
-						this.ctx.drawImage(entity.image, -entity.image.width / 2, -entity.image.height / 2);
-						this.ctx.restore();
+						if (entity instanceof Farm) {
+							farms.push(entity);
+						} else if (entity instanceof Villager) {
+							villagers.push(entity);
+						} else if (entity instanceof House) {
+							houses.push(entity);
+							continue;
+						}
 					}
 				} catch (err) {
 					_didIteratorError2 = true;
@@ -953,12 +954,9 @@
 				var _iteratorError3 = undefined;
 
 				try {
-					for (var _iterator3 = houses[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+					for (var _iterator3 = farms[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
 						var entity = _step3.value;
 
-						if (entity.built) {
-							continue;
-						}
 						this.ctx.save();
 						this.ctx.translate(entity.pos.x - this.offset.x, entity.pos.y - this.offset.y);
 						this.ctx.drawImage(entity.image, -entity.image.width / 2, -entity.image.height / 2);
@@ -984,12 +982,14 @@
 				var _iteratorError4 = undefined;
 
 				try {
-					for (var _iterator4 = villagers[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+					for (var _iterator4 = houses[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
 						var entity = _step4.value;
 
+						if (entity.built) {
+							continue;
+						}
 						this.ctx.save();
 						this.ctx.translate(entity.pos.x - this.offset.x, entity.pos.y - this.offset.y);
-						this.ctx.rotate(entity.angle);
 						this.ctx.drawImage(entity.image, -entity.image.width / 2, -entity.image.height / 2);
 						this.ctx.restore();
 					}
@@ -1013,8 +1013,37 @@
 				var _iteratorError5 = undefined;
 
 				try {
-					for (var _iterator5 = houses[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+					for (var _iterator5 = villagers[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
 						var entity = _step5.value;
+
+						this.ctx.save();
+						this.ctx.translate(entity.pos.x - this.offset.x, entity.pos.y - this.offset.y);
+						this.ctx.rotate(entity.angle);
+						this.ctx.drawImage(entity.image, -entity.image.width / 2, -entity.image.height / 2);
+						this.ctx.restore();
+					}
+				} catch (err) {
+					_didIteratorError5 = true;
+					_iteratorError5 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion5 && _iterator5.return) {
+							_iterator5.return();
+						}
+					} finally {
+						if (_didIteratorError5) {
+							throw _iteratorError5;
+						}
+					}
+				}
+
+				var _iteratorNormalCompletion6 = true;
+				var _didIteratorError6 = false;
+				var _iteratorError6 = undefined;
+
+				try {
+					for (var _iterator6 = houses[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+						var entity = _step6.value;
 
 						if (!entity.built) {
 							continue;
@@ -1037,16 +1066,16 @@
 						this.ctx.restore();
 					}
 				} catch (err) {
-					_didIteratorError5 = true;
-					_iteratorError5 = err;
+					_didIteratorError6 = true;
+					_iteratorError6 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion5 && _iterator5.return) {
-							_iterator5.return();
+						if (!_iteratorNormalCompletion6 && _iterator6.return) {
+							_iterator6.return();
 						}
 					} finally {
-						if (_didIteratorError5) {
-							throw _iteratorError5;
+						if (_didIteratorError6) {
+							throw _iteratorError6;
 						}
 					}
 				}
