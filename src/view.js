@@ -14,6 +14,7 @@ class View{
 		this.offset = {x: 0, y: 0}
 
 		this.tileImage = null
+		this.treeType = []
 	}
 
 	move(vector){
@@ -139,6 +140,8 @@ class View{
 				this.renderImageAtTile(I.FARM_BARE, absPos)
 			}
 		}
+
+		this.renderTrees()
 	}
 
 	renderTiles(){
@@ -146,6 +149,36 @@ class View{
 			this.updateTileImage()
 		}
 		this.ctx.drawImage(this.tileImage, -this.offset.x, -this.offset.y)
+	}
+
+	renderTrees(){
+		// Render tree layer
+		for(var x = 0; x < this.map.width; x++){
+			for(var y = 0; y < this.map.height; y++){
+				if(this.map.data[x][y] !== 'tree'){
+					continue
+				}
+				if(this.treeType[x] === undefined){
+					this.treeType[x] = []
+				}
+				if(this.treeType[x][y] === undefined){
+					var treeType = 'green'
+					if(Math.random() < C.TREE_BROWN_PERCENT){
+						treeType = 'brown'
+					}
+					this.treeType[x][y] = treeType
+				}
+				var treeImage = I.TREE
+				if(this.treeType[x][y] === 'brown'){
+					treeImage = I.TREE_BROWN
+				}
+				this.ctx.drawImage(
+					treeImage,
+					x*this.map.tileWidth - I.TREE.width/2 + this.map.tileWidth/2 - this.offset.x,
+					y*this.map.tileHeight - I.TREE.height/2 + this.map.tileHeight/2 - this.offset.y
+				)
+			}
+		}
 	}
 
 	updateTileImage(){
@@ -164,7 +197,7 @@ class View{
 						ctx.strokeStyle = '#22a'
 						break
 					case 'tree':
-						ctx.fillStyle = '#040'
+						ctx.fillStyle = '#171'
 						ctx.strokeStyle = '#040'
 						break
 					default:
