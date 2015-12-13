@@ -27,6 +27,10 @@ class Controller{
 						this.placingTree = false
 						this.map.placeTree({x: this.mousePos.x + view.offset.x, y: this.mousePos.y + view.offset.y})
 					}
+					if(this.deleting){
+						this.deleting = false
+						this.map.deleteEntity({x: this.mousePos.x + view.offset.x, y: this.mousePos.y + view.offset.y})
+					}
 					break
 				case 2:
 					this.draggingView = true
@@ -87,20 +91,31 @@ class Controller{
 					this.placingFarm = true
 					this.placingHouse = false
 					this.placingTree = false
+					this.deleting = false
 					break
 				case 72:
 					this.placingHouse = true
 					this.placingFarm = false
 					this.placingTree = false
+					this.deleting = false
 					break
 				case 84:
 					this.placingTree = true
 					this.placingFarm = false
 					this.placingHouse = false
+					this.deleting = false
+					break
+				case 68:
+					this.deleting = true
+					this.placingFarm = false
+					this.placingHouse = false
+					this.placingTree = false
 					break
 				case 27:
 					this.placingFarm = false
 					this.placingHouse = false
+					this.placingTree = false
+					this.deleting = false
 					break
 			}
 		})

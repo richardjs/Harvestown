@@ -158,6 +158,13 @@ class View{
 				this.renderImageAtTile(I.TREE, absPos)
 			}
 		}
+		if(controller.deleting){
+			var absPos = {x: controller.mousePos.x + this.offset.x, y: controller.mousePos.y + this.offset.y}
+			var entity = map.entityAtPixel(absPos)
+			if(entity && entity.type !== 'villager' && entity.type !== 'treesapling'){
+				this.renderImageAtTile(I.DELETE, absPos)
+			}
+		}
 	}
 
 	renderTiles(){

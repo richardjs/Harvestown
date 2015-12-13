@@ -11,6 +11,8 @@ class House{
 		this.pos = pos
 		this.image = I.HOUSE_FOUNDATION
 
+		this.villager = null
+
 		this.lumber = 0
 
 		this.food = 0
@@ -43,7 +45,8 @@ class House{
 	}
 
 	spawnVillager(){
-		this.map.entities.push(new Villager(this.map, this))
+		this.villager = new Villager(this.map, this)
+		this.map.entities.push(this.villager)
 	}
 
 	update(){}

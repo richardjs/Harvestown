@@ -277,6 +277,27 @@
 				this.entities.push(new TreeSapling(this, treePos));
 			}
 		}, {
+			key: 'deleteEntity',
+			value: function deleteEntity(pos) {
+				pos = this.tileToPixel(this.pixelToTile(pos));
+				var entity = this.entityAtPixel(pos);
+				if (entity && entity !== 'villager' && entity !== 'treesapling') {
+					if (entity.activeVillager) {
+						entity.activeVillager.activeFarm = null;
+						entity.activeVillager.activeHouse = null;
+						entity.activeVillager.activeSapling = null;
+						entity.activeVillager.carryingFood = false;
+						entity.activeVillager.carryingLumber = false;
+						entity.activeVillager.path = [];
+						entity.activeVillager.pixelTarget = null;
+					}
+					if (entity.villager) {
+						this.entities.splice(this.entities.indexOf(entity.villager), 1);
+					}
+					this.entities.splice(this.entities.indexOf(entity), 1);
+				}
+			}
+		}, {
 			key: 'in',
 			value: function _in(pos) {
 				return !(pos.x < 0 || pos.x >= this.width || pos.y < 0 || pos.y >= this.height);
@@ -307,7 +328,7 @@
 
 						if (entity.tile && entity.type !== 'villager') {
 							if (entity.tile.x === pos.x && entity.tile.y === pos.y) {
-								return true;
+								return entity;
 							}
 						}
 					}
@@ -374,6 +395,8 @@
 			this.pos = pos;
 			this.image = I.HOUSE_FOUNDATION;
 
+			this.villager = null;
+
 			this.lumber = 0;
 
 			this.food = 0;
@@ -401,7 +424,8 @@
 		}, {
 			key: 'spawnVillager',
 			value: function spawnVillager() {
-				this.map.entities.push(new Villager(this.map, this));
+				this.villager = new Villager(this.map, this);
+				this.map.entities.push(this.villager);
 			}
 		}, {
 			key: 'update',
@@ -460,6 +484,9 @@
 	exports.TREE_UNPLANTED.src = __webpack_require__(22);
 	exports.TREE_GROWING = new Image();
 	exports.TREE_GROWING.src = __webpack_require__(23);
+
+	exports.DELETE = new Image();
+	exports.DELETE.src = __webpack_require__(24);
 
 /***/ },
 /* 5 */
@@ -1330,6 +1357,13 @@
 						this.renderImageAtTile(I.TREE, absPos);
 					}
 				}
+				if (controller.deleting) {
+					var absPos = { x: controller.mousePos.x + this.offset.x, y: controller.mousePos.y + this.offset.y };
+					var entity = map.entityAtPixel(absPos);
+					if (entity && entity.type !== 'villager' && entity.type !== 'treesapling') {
+						this.renderImageAtTile(I.DELETE, absPos);
+					}
+				}
 			}
 		}, {
 			key: 'renderTiles',
@@ -1445,6 +1479,10 @@
 						_this.placingTree = false;
 						_this.map.placeTree({ x: _this.mousePos.x + view.offset.x, y: _this.mousePos.y + view.offset.y });
 					}
+					if (_this.deleting) {
+						_this.deleting = false;
+						_this.map.deleteEntity({ x: _this.mousePos.x + view.offset.x, y: _this.mousePos.y + view.offset.y });
+					}
 					break;
 				case 2:
 					_this.draggingView = true;
@@ -1505,20 +1543,31 @@
 					_this.placingFarm = true;
 					_this.placingHouse = false;
 					_this.placingTree = false;
+					_this.deleting = false;
 					break;
 				case 72:
 					_this.placingHouse = true;
 					_this.placingFarm = false;
 					_this.placingTree = false;
+					_this.deleting = false;
 					break;
 				case 84:
 					_this.placingTree = true;
 					_this.placingFarm = false;
 					_this.placingHouse = false;
+					_this.deleting = false;
+					break;
+				case 68:
+					_this.deleting = true;
+					_this.placingFarm = false;
+					_this.placingHouse = false;
+					_this.placingTree = false;
 					break;
 				case 27:
 					_this.placingFarm = false;
 					_this.placingHouse = false;
+					_this.placingTree = false;
+					_this.deleting = false;
 					break;
 			}
 		});
@@ -1755,6 +1804,12 @@
 /***/ function(module, exports) {
 
 	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAADOQAAAzkB9DppvwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAGcSURBVCiRldI9S1tRGAfw/znn3nty83ZzY0xULGoiYgLFCi4dbDvqKI7ZXRz8Di3SD1BwcBA3P4FDhyIi7SJZRNoiNJWS2JDmPdfc3NfToQ3YUEL8T8/w//E8w0MwlNSSlp5cVo4ISKlVMj8oIRYWIOHiRfPtw540GGafRfPhlJyLpvhWdIZnASCVC+UBwHeFLzxhfP/UejfoMwCIzQVXsxvxU/2J+pJHpMnhKwglJBhXnkeScpopUtX4ZZUpACTm+aasMmkYPEwgwmLTTyM7Uzl1HwDo7Kq2nVwO7Y1C/26HCgAs8yJ2os0EMuNCyqguXO8jSyyEVsJJZW1cKHHKfQ+L1DHdu3HRINa9X6Bck1Yeg4yqXf/52X5De037yun51rjQtX2nU+o0WOO2fy5c0dbn1U1CyUgkfIFG0byqfTOPKAD8KHQOOmXr6yhkdV3j5qyx++V9fR34+zkABNd417l3a2bb6wV1eY6QPxs8W4BKBJVr47B40XoNQADA/26jS6/0fTUur7dK5nH7tn+pTAQWnEr3rNlEe1D6Dd/ukgxRbSD2AAAAAElFTkSuQmCC"
+
+/***/ },
+/* 24 */
+/***/ function(module, exports) {
+
+	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAFAQAABQEBbNEZDAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACRSURBVDiNtdQxDsMwCIXhn961S5RcpvLSy+Z1SaQqMjbQ1KvNZyzACEzwEmwUl+ApeAsMQRNIsAuWArYcsRK0U9+/0HCmndjV25iiLjY44KJTLIOGsQiaxkZoGRugdcxBQ9ijcI/dkd31ybkx7RWgPFGjaqbRSGuE0UyfTdFK07roLxPQRfWHD9YONI1d0CawD+OBJtjZ/u/8AAAAAElFTkSuQmCC"
 
 /***/ }
 /******/ ]);

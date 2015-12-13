@@ -31,3 +31,6 @@ exports.TREE_UNPLANTED = new Image()
 exports.TREE_UNPLANTED.src = require('../img/tree_unplanted.png')
 exports.TREE_GROWING = new Image()
 exports.TREE_GROWING.src = require('../img/tree_growing.png')
+
+exports.DELETE = new Image()
+exports.DELETE.src = require('../img/delete.png')

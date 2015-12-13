@@ -78,6 +78,26 @@ class Map{
 		this.entities.push(new TreeSapling(this, treePos))
 	}
 
+	deleteEntity(pos){
+		pos = this.tileToPixel(this.pixelToTile(pos))
+		var entity = this.entityAtPixel(pos)
+		if(entity && entity !== 'villager' && entity !== 'treesapling'){
+			if(entity.activeVillager){
+				entity.activeVillager.activeFarm = null
+				entity.activeVillager.activeHouse = null
+				entity.activeVillager.activeSapling = null
+				entity.activeVillager.carryingFood = false
+				entity.activeVillager.carryingLumber = false
+				entity.activeVillager.path = []
+				entity.activeVillager.pixelTarget = null
+			}
+			if(entity.villager){
+				this.entities.splice(this.entities.indexOf(entity.villager), 1)
+			}
+			this.entities.splice(this.entities.indexOf(entity), 1)
+		}
+	}
+
 	in(pos){
 		return !(pos.x < 0 || pos.x >= this.width || pos.y < 0 || pos.y >= this.height)
 	}
@@ -97,7 +117,7 @@ class Map{
 		for(var entity of this.entities){
 			if(entity.tile && entity.type !== 'villager'){
 				if(entity.tile.x === pos.x && entity.tile.y === pos.y){
-					return true
+					return entity
 				}
 			}
 		}
