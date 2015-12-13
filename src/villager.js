@@ -110,6 +110,8 @@ class Villager{
 			this.image = I.VILLAGER_LUMBER
 		}else if(this.carryingFood){
 			this.image = I.VILLAGER_FOOD
+		}else if(this.hungry && !(this.tile.x === this.house.tile.x && this.tile.y === this.house.tile.y)){
+			this.image = I.VILLAGER_HUNGRY
 		}else{
 			this.image = I.VILLAGER
 		}
