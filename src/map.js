@@ -4,6 +4,7 @@ var C = require('./constants.js')
 var Farm = require('./farm.js')
 var House = require('./house.js')
 var Villager = require('./villager.js')
+var TreeSapling = require('./treesapling.js')
 
 class Map{
 	constructor(width, height, tileWidth, tileHeight){
@@ -48,36 +49,33 @@ class Map{
 
 	placeFarm(pos){
 		var farmPos = this.tileToPixel(this.pixelToTile(pos))
-		if(this.atPixel(farmPos) !== undefined){
+		if(this.atPixel(farmPos) !== undefined || this.entityAtPixel(farmPos)){
 			return
-		}
-		for(var entity of this.entities){
-			if(entity instanceof Villager){
-				continue
-			}
-			if(entity.pos.x === farmPos.x && entity.pos.y === farmPos.y){
-				return
-			}
 		}
 		this.entities.push(new Farm(this, farmPos))
 	}
 
 	placeHouse(pos){
 		var housePos = this.tileToPixel(this.pixelToTile(pos))
-		if(this.atPixel(housePos) !== undefined){
+		if(this.atPixel(housePos) !== undefined || this.entityAtPixel(housePos)){
 			return
 		}
 		var firstHouse = true
 		for(var entity of this.entities){
-			if(entity.type !== 'house'){
-				continue
-			}
-			firstHouse = false
-			if(entity.pos.x === housePos.x && entity.pos.y === housePos.y){
-				return
+			if(entity.type === 'house'){
+				firstHouse = false
+				break
 			}
 		}
 		this.entities.push(new House(this, housePos, firstHouse))
+	}
+
+	placeTree(pos){
+		var treePos = this.tileToPixel(this.pixelToTile(pos))
+		if(this.atPixel(treePos) !== undefined || this.entityAtPixel(treePos)){
+			return
+		}
+		this.entities.push(new TreeSapling(this, treePos))
 	}
 
 	in(pos){
@@ -93,6 +91,22 @@ class Map{
 
 	atPixel(pos){
 		return this.data[Math.floor(pos.x / this.tileWidth)][Math.floor(pos.y / this.tileHeight)]
+	}
+
+	entityAt(pos){
+		for(var entity of this.entities){
+			if(entity.tile && entity.type !== 'villager'){
+				if(entity.tile.x === pos.x && entity.tile.y === pos.y){
+					return true
+				}
+			}
+		}
+		return false
+	}
+
+	entityAtPixel(pos){
+		var tile = this.pixelToTile(pos)
+		return this.entityAt(tile)
 	}
 
 	pixelToTile(pos){

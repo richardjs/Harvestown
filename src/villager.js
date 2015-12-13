@@ -24,6 +24,7 @@ class Villager{
 		this.pixelTarget = null
 		this.activeFarm = null
 		this.activeHouse = null
+		this.activeSapling = null
 	}
 
 	get tile(){
@@ -373,6 +374,38 @@ class Villager{
 					this.activeHouse.activeVillager = this
 					return
 				}
+			}
+		}
+
+		// If we're planting a tree
+		if(this.activeSapling){
+			// We're at the sapligng location
+			if(this.tile.x === this.activeSapling.tile.x && this.tile.y === this.activeSapling.tile.y){
+				this.activeSapling.plant()
+				this.activeSapling = null
+				return
+			}else{
+				this.activeSapling.activeVillager = null
+				this.activeSapling = null
+			}
+		}else{
+			//Look for a sapling to work
+			var closestSapling = null
+			var closestDistance = Infinity
+			for(var entity of this.map.entities){
+				if(entity.type === 'treesapling' && !entity.activeVillager && entity.state === 'unplanted'){
+					var distance = this.distanceTo(entity)
+					if(distance < closestDistance){
+						closestSapling = entity
+						closestDistance = distance
+					}
+				}
+			}
+			if(closestSapling){
+				this.activeSapling = closestSapling
+				this.activeSapling.activeVillager = this
+				this.goToTile(closestSapling.tile)
+				return
 			}
 		}
 

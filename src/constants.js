@@ -22,6 +22,9 @@ exports.HOUSE_STARTING_FOOD = 3
 exports.HOUSE_MAX_FOOD = 5
 exports.HOUSE_REQUIRED_LUMBER = 5
 
+// Tree parameters
+exports.TREE_GROWTH_TIME = 5*60*1000
+
 // Map generation parameters
 exports.WATER_CELL_RANDOM_START_CHANCE = .47
 exports.WATER_GENERATIONS = 50

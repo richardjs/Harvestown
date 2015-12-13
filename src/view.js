@@ -54,20 +54,30 @@ class View{
 		var farms = []
 		var villagers = []
 		var houses = []
+		var treesaplings = []
 		for(var entity of this.map.entities){
 			if(entity instanceof Farm){
 				farms.push(entity)
-			}
-			else if(entity instanceof Villager){
+			}else if(entity instanceof Villager){
 				villagers.push(entity)
-			}
-			else if(entity instanceof House){
+			}else if(entity instanceof House){
 				houses.push(entity)
-				continue
+			}else if(entity.type === 'treesapling'){
+				treesaplings.push(entity)
 			}
 		}
 
 		for(var entity of farms){
+			this.ctx.save()
+			this.ctx.translate(
+				entity.pos.x - this.offset.x,
+				entity.pos.y - this.offset.y
+			)
+			this.ctx.drawImage(entity.image, -entity.image.width/2, -entity.image.height/2)
+			this.ctx.restore()
+		}
+
+		for(var entity of treesaplings){
 			this.ctx.save()
 			this.ctx.translate(
 				entity.pos.x - this.offset.x,
@@ -128,20 +138,26 @@ class View{
 			this.ctx.restore()
 		}
 
+		this.renderTrees()
+
 		if(controller.placingHouse){
 			var absPos = {x: controller.mousePos.x + this.offset.x, y: controller.mousePos.y + this.offset.y}
-			if(map.atPixel(absPos) === undefined){
+			if(map.atPixel(absPos) === undefined && !map.entityAtPixel(absPos)){
 				this.renderImageAtTile(I.HOUSE, absPos)
 			}
 		}
 		if(controller.placingFarm){
 			var absPos = {x: controller.mousePos.x + this.offset.x, y: controller.mousePos.y + this.offset.y}
-			if(map.atPixel(absPos) === undefined){
+			if(map.atPixel(absPos) === undefined && !map.entityAtPixel(absPos)){
 				this.renderImageAtTile(I.FARM_BARE, absPos)
 			}
 		}
-
-		this.renderTrees()
+		if(controller.placingTree){
+			var absPos = {x: controller.mousePos.x + this.offset.x, y: controller.mousePos.y + this.offset.y}
+			if(map.atPixel(absPos) === undefined && !map.entityAtPixel(absPos)){
+				this.renderImageAtTile(I.TREE, absPos)
+			}
+		}
 	}
 
 	renderTiles(){

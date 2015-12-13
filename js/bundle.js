@@ -145,6 +145,9 @@
 	exports.HOUSE_MAX_FOOD = 5;
 	exports.HOUSE_REQUIRED_LUMBER = 5;
 
+	// Tree parameters
+	exports.TREE_GROWTH_TIME = 5 * 60 * 1000;
+
 	// Map generation parameters
 	exports.WATER_CELL_RANDOM_START_CHANCE = .47;
 	exports.WATER_GENERATIONS = 50;
@@ -169,6 +172,7 @@
 	var Farm = __webpack_require__(11);
 	var House = __webpack_require__(3);
 	var Villager = __webpack_require__(7);
+	var TreeSapling = __webpack_require__(21);
 
 	var Map = (function () {
 		function Map(width, height, tileWidth, tileHeight) {
@@ -220,9 +224,19 @@
 			key: 'placeFarm',
 			value: function placeFarm(pos) {
 				var farmPos = this.tileToPixel(this.pixelToTile(pos));
-				if (this.atPixel(farmPos) !== undefined) {
+				if (this.atPixel(farmPos) !== undefined || this.entityAtPixel(farmPos)) {
 					return;
 				}
+				this.entities.push(new Farm(this, farmPos));
+			}
+		}, {
+			key: 'placeHouse',
+			value: function placeHouse(pos) {
+				var housePos = this.tileToPixel(this.pixelToTile(pos));
+				if (this.atPixel(housePos) !== undefined || this.entityAtPixel(housePos)) {
+					return;
+				}
+				var firstHouse = true;
 				var _iteratorNormalCompletion = true;
 				var _didIteratorError = false;
 				var _iteratorError = undefined;
@@ -231,11 +245,9 @@
 					for (var _iterator = this.entities[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
 						var entity = _step.value;
 
-						if (entity instanceof Villager) {
-							continue;
-						}
-						if (entity.pos.x === farmPos.x && entity.pos.y === farmPos.y) {
-							return;
+						if (entity.type === 'house') {
+							firstHouse = false;
+							break;
 						}
 					}
 				} catch (err) {
@@ -253,48 +265,16 @@
 					}
 				}
 
-				this.entities.push(new Farm(this, farmPos));
+				this.entities.push(new House(this, housePos, firstHouse));
 			}
 		}, {
-			key: 'placeHouse',
-			value: function placeHouse(pos) {
-				var housePos = this.tileToPixel(this.pixelToTile(pos));
-				if (this.atPixel(housePos) !== undefined) {
+			key: 'placeTree',
+			value: function placeTree(pos) {
+				var treePos = this.tileToPixel(this.pixelToTile(pos));
+				if (this.atPixel(treePos) !== undefined || this.entityAtPixel(treePos)) {
 					return;
 				}
-				var firstHouse = true;
-				var _iteratorNormalCompletion2 = true;
-				var _didIteratorError2 = false;
-				var _iteratorError2 = undefined;
-
-				try {
-					for (var _iterator2 = this.entities[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-						var entity = _step2.value;
-
-						if (entity.type !== 'house') {
-							continue;
-						}
-						firstHouse = false;
-						if (entity.pos.x === housePos.x && entity.pos.y === housePos.y) {
-							return;
-						}
-					}
-				} catch (err) {
-					_didIteratorError2 = true;
-					_iteratorError2 = err;
-				} finally {
-					try {
-						if (!_iteratorNormalCompletion2 && _iterator2.return) {
-							_iterator2.return();
-						}
-					} finally {
-						if (_didIteratorError2) {
-							throw _iteratorError2;
-						}
-					}
-				}
-
-				this.entities.push(new House(this, housePos, firstHouse));
+				this.entities.push(new TreeSapling(this, treePos));
 			}
 		}, {
 			key: 'in',
@@ -313,6 +293,46 @@
 			key: 'atPixel',
 			value: function atPixel(pos) {
 				return this.data[Math.floor(pos.x / this.tileWidth)][Math.floor(pos.y / this.tileHeight)];
+			}
+		}, {
+			key: 'entityAt',
+			value: function entityAt(pos) {
+				var _iteratorNormalCompletion2 = true;
+				var _didIteratorError2 = false;
+				var _iteratorError2 = undefined;
+
+				try {
+					for (var _iterator2 = this.entities[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+						var entity = _step2.value;
+
+						if (entity.tile && entity.type !== 'villager') {
+							if (entity.tile.x === pos.x && entity.tile.y === pos.y) {
+								return true;
+							}
+						}
+					}
+				} catch (err) {
+					_didIteratorError2 = true;
+					_iteratorError2 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion2 && _iterator2.return) {
+							_iterator2.return();
+						}
+					} finally {
+						if (_didIteratorError2) {
+							throw _iteratorError2;
+						}
+					}
+				}
+
+				return false;
+			}
+		}, {
+			key: 'entityAtPixel',
+			value: function entityAtPixel(pos) {
+				var tile = this.pixelToTile(pos);
+				return this.entityAt(tile);
 			}
 		}, {
 			key: 'pixelToTile',
@@ -436,6 +456,10 @@
 	exports.TREE.src = __webpack_require__(19);
 	exports.TREE_BROWN = new Image();
 	exports.TREE_BROWN.src = __webpack_require__(20);
+	exports.TREE_UNPLANTED = new Image();
+	exports.TREE_UNPLANTED.src = __webpack_require__(22);
+	exports.TREE_GROWING = new Image();
+	exports.TREE_GROWING.src = __webpack_require__(23);
 
 /***/ },
 /* 5 */
@@ -485,6 +509,7 @@
 			this.pixelTarget = null;
 			this.activeFarm = null;
 			this.activeHouse = null;
+			this.activeSapling = null;
 		}
 
 		_createClass(Villager, [{
@@ -884,16 +909,70 @@
 						}
 					}
 
+				// If we're planting a tree
+				if (this.activeSapling) {
+					// We're at the sapligng location
+					if (this.tile.x === this.activeSapling.tile.x && this.tile.y === this.activeSapling.tile.y) {
+						this.activeSapling.plant();
+						this.activeSapling = null;
+						return;
+					} else {
+						this.activeSapling.activeVillager = null;
+						this.activeSapling = null;
+					}
+				} else {
+					//Look for a sapling to work
+					var closestSapling = null;
+					var closestDistance = Infinity;
+					var _iteratorNormalCompletion3 = true;
+					var _didIteratorError3 = false;
+					var _iteratorError3 = undefined;
+
+					try {
+						for (var _iterator3 = this.map.entities[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+							var entity = _step3.value;
+
+							if (entity.type === 'treesapling' && !entity.activeVillager && entity.state === 'unplanted') {
+								var distance = this.distanceTo(entity);
+								if (distance < closestDistance) {
+									closestSapling = entity;
+									closestDistance = distance;
+								}
+							}
+						}
+					} catch (err) {
+						_didIteratorError3 = true;
+						_iteratorError3 = err;
+					} finally {
+						try {
+							if (!_iteratorNormalCompletion3 && _iterator3.return) {
+								_iterator3.return();
+							}
+						} finally {
+							if (_didIteratorError3) {
+								throw _iteratorError3;
+							}
+						}
+					}
+
+					if (closestSapling) {
+						this.activeSapling = closestSapling;
+						this.activeSapling.activeVillager = this;
+						this.goToTile(closestSapling.tile);
+						return;
+					}
+				}
+
 				// Look for farms to work
 				var closestFarm = null;
 				var closestDistance = Infinity;
-				var _iteratorNormalCompletion3 = true;
-				var _didIteratorError3 = false;
-				var _iteratorError3 = undefined;
+				var _iteratorNormalCompletion4 = true;
+				var _didIteratorError4 = false;
+				var _iteratorError4 = undefined;
 
 				try {
-					for (var _iterator3 = this.map.entities[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-						var entity = _step3.value;
+					for (var _iterator4 = this.map.entities[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+						var entity = _step4.value;
 
 						if (entity.type === 'farm' && !entity.activeVillager && (entity.state === 'unplanted' || entity.state === 'matured')) {
 							if (entity.state === 'matured' && !this.findDepot()) {
@@ -908,16 +987,16 @@
 						}
 					}
 				} catch (err) {
-					_didIteratorError3 = true;
-					_iteratorError3 = err;
+					_didIteratorError4 = true;
+					_iteratorError4 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion3 && _iterator3.return) {
-							_iterator3.return();
+						if (!_iteratorNormalCompletion4 && _iterator4.return) {
+							_iterator4.return();
 						}
 					} finally {
-						if (_didIteratorError3) {
-							throw _iteratorError3;
+						if (_didIteratorError4) {
+							throw _iteratorError4;
 						}
 					}
 				}
@@ -1036,6 +1115,7 @@
 				var farms = [];
 				var villagers = [];
 				var houses = [];
+				var treesaplings = [];
 				var _iteratorNormalCompletion2 = true;
 				var _didIteratorError2 = false;
 				var _iteratorError2 = undefined;
@@ -1050,7 +1130,8 @@
 							villagers.push(entity);
 						} else if (entity instanceof House) {
 							houses.push(entity);
-							continue;
+						} else if (entity.type === 'treesapling') {
+							treesaplings.push(entity);
 						}
 					}
 				} catch (err) {
@@ -1101,12 +1182,9 @@
 				var _iteratorError4 = undefined;
 
 				try {
-					for (var _iterator4 = houses[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+					for (var _iterator4 = treesaplings[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
 						var entity = _step4.value;
 
-						if (entity.built) {
-							continue;
-						}
 						this.ctx.save();
 						this.ctx.translate(entity.pos.x - this.offset.x, entity.pos.y - this.offset.y);
 						this.ctx.drawImage(entity.image, -entity.image.width / 2, -entity.image.height / 2);
@@ -1132,12 +1210,14 @@
 				var _iteratorError5 = undefined;
 
 				try {
-					for (var _iterator5 = villagers[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+					for (var _iterator5 = houses[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
 						var entity = _step5.value;
 
+						if (entity.built) {
+							continue;
+						}
 						this.ctx.save();
 						this.ctx.translate(entity.pos.x - this.offset.x, entity.pos.y - this.offset.y);
-						this.ctx.rotate(entity.angle);
 						this.ctx.drawImage(entity.image, -entity.image.width / 2, -entity.image.height / 2);
 						this.ctx.restore();
 					}
@@ -1161,8 +1241,37 @@
 				var _iteratorError6 = undefined;
 
 				try {
-					for (var _iterator6 = houses[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+					for (var _iterator6 = villagers[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
 						var entity = _step6.value;
+
+						this.ctx.save();
+						this.ctx.translate(entity.pos.x - this.offset.x, entity.pos.y - this.offset.y);
+						this.ctx.rotate(entity.angle);
+						this.ctx.drawImage(entity.image, -entity.image.width / 2, -entity.image.height / 2);
+						this.ctx.restore();
+					}
+				} catch (err) {
+					_didIteratorError6 = true;
+					_iteratorError6 = err;
+				} finally {
+					try {
+						if (!_iteratorNormalCompletion6 && _iterator6.return) {
+							_iterator6.return();
+						}
+					} finally {
+						if (_didIteratorError6) {
+							throw _iteratorError6;
+						}
+					}
+				}
+
+				var _iteratorNormalCompletion7 = true;
+				var _didIteratorError7 = false;
+				var _iteratorError7 = undefined;
+
+				try {
+					for (var _iterator7 = houses[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+						var entity = _step7.value;
 
 						if (!entity.built) {
 							continue;
@@ -1187,34 +1296,40 @@
 						this.ctx.restore();
 					}
 				} catch (err) {
-					_didIteratorError6 = true;
-					_iteratorError6 = err;
+					_didIteratorError7 = true;
+					_iteratorError7 = err;
 				} finally {
 					try {
-						if (!_iteratorNormalCompletion6 && _iterator6.return) {
-							_iterator6.return();
+						if (!_iteratorNormalCompletion7 && _iterator7.return) {
+							_iterator7.return();
 						}
 					} finally {
-						if (_didIteratorError6) {
-							throw _iteratorError6;
+						if (_didIteratorError7) {
+							throw _iteratorError7;
 						}
 					}
 				}
 
+				this.renderTrees();
+
 				if (controller.placingHouse) {
 					var absPos = { x: controller.mousePos.x + this.offset.x, y: controller.mousePos.y + this.offset.y };
-					if (map.atPixel(absPos) === undefined) {
+					if (map.atPixel(absPos) === undefined && !map.entityAtPixel(absPos)) {
 						this.renderImageAtTile(I.HOUSE, absPos);
 					}
 				}
 				if (controller.placingFarm) {
 					var absPos = { x: controller.mousePos.x + this.offset.x, y: controller.mousePos.y + this.offset.y };
-					if (map.atPixel(absPos) === undefined) {
+					if (map.atPixel(absPos) === undefined && !map.entityAtPixel(absPos)) {
 						this.renderImageAtTile(I.FARM_BARE, absPos);
 					}
 				}
-
-				this.renderTrees();
+				if (controller.placingTree) {
+					var absPos = { x: controller.mousePos.x + this.offset.x, y: controller.mousePos.y + this.offset.y };
+					if (map.atPixel(absPos) === undefined && !map.entityAtPixel(absPos)) {
+						this.renderImageAtTile(I.TREE, absPos);
+					}
+				}
 			}
 		}, {
 			key: 'renderTiles',
@@ -1326,6 +1441,10 @@
 						_this.placingFarm = false;
 						_this.map.placeFarm({ x: _this.mousePos.x + view.offset.x, y: _this.mousePos.y + view.offset.y });
 					}
+					if (_this.placingTree) {
+						_this.placingTree = false;
+						_this.map.placeTree({ x: _this.mousePos.x + view.offset.x, y: _this.mousePos.y + view.offset.y });
+					}
 					break;
 				case 2:
 					_this.draggingView = true;
@@ -1385,10 +1504,17 @@
 				case 70:
 					_this.placingFarm = true;
 					_this.placingHouse = false;
+					_this.placingTree = false;
 					break;
 				case 72:
 					_this.placingHouse = true;
 					_this.placingFarm = false;
+					_this.placingTree = false;
+					break;
+				case 84:
+					_this.placingTree = true;
+					_this.placingFarm = false;
+					_this.placingHouse = false;
 					break;
 				case 27:
 					_this.placingFarm = false;
@@ -1552,6 +1678,83 @@
 /***/ function(module, exports) {
 
 	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAADFQAAAxUBvWXHXAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAQ0SURBVDiNhdVLbFx3FQbw333NeDwZ2xPHdjyx0yY0LbSUCoIIbaOChFiCWFRdsechlRULJCQkNkioQrCjEusICbFFqlgBG4xABaGS4ihp7fqR1m/PjMczc18srhuh0Iazuveee77/dx7f+Uf+j91Y8uPPdfxkqub8ds8/MT5z1dHE6KPigkdg1l563K+ud3wzCYU7XYaF9dPMahJZrEc6+wN33rjrS0gfCfzZi16enfRiPXalkXjiStszJyNOj7kSs5WST3K+Vf0/zlnZ8NOVTT94GDj675cXL7v1zLxv5AOfnM7ND/sUPa7WCTEaok82JO0z6NOe8ew4t7c38A+U/8P4sZYXvv60P44y8fyAZsjmPotjDgPKkrmAApt1lttV8J2Cdpt3D711v+vXK1teQ/qA8acXfe9q283uIe2A97ssjjgqWUdRVs/bJZ2c4z79YQV+ErLcNr845SsbR/7QG3s3husd37/W9t3dHaZOGZ5QL3kHhyFByHFJcJbfnZzHSi7k3E9ZSFnfpdEiDtUh/uKyn33hklf7O5JrDXa6FeMVFWArYipgPuEgIztjfRfbGQtj4oAnY1ZHCDUgXGh6YSKW1OKKTVFwVFCGTARcqxEHkfW0blgmWlHgco1aQBqyULK9Xx0o5OI5z0HUafnMpSk3BqekAyaG3AlIQp6ocZDH1rNJp2K9MtEtI504k5acIC64VLJRELQ4P+npbumNKAk1r816ZdwnPK6k9H5QjddSjffSmokk9u3HMzMJqyeRulwjKByV9EpaAa2ZKtP5ac1xaiksSoODPp2YYIJmQKMkCqvSpGUgUIpCkqB88C05a+RsyWlEI2Y6Y5yRFXrx0rQvFykTIbMtDk7P6lXQz5mLU1tp7Od3P2xCbrGeWhtXWU2WyKpxzLDTt/XOgR/G03Wfv9Dm3h5XE9KSpGSIrYyn6pmJYKBbxAql5WSslzMoKrAi4Bw2h+TTrO345dqRtXBvaLUo5c02G+NKWc9FTOcMSv49Ii9zS8nIdDB2VHAvJSu4nFOPSGcY1ZlpcjyyBtHGsd+FgWLunOezVDLTYC9joag6naJXsJtVIjkqqhLM5XRC+lNcmGQ/pDnB2x/47cHQWxFsdP0pDrQuNNxcjGhNsjvi2ZL5kiKni6mCiznNkuWwmp6FNmnBYUwtUd7e8ZujkdsPltDiOZ/66if8PRmrRxkTWbXJooD8TL61gIOAtFEJqB9SNsgSRW9sZXXfrX/teB1F/CHw/b63u2N/fXLWTTjs0a7TPltTuyeMR7SnaMdsjmm0GRd6f37Pd27vuPWx+3gycdQbOTwc+SAlyxNzvSGH6NdJm1VD91PC6aqmf9v2+pvbXvOQPepqip5f9ovrHd+aTCSw1bXZG3szCswlkYtHp/Z/f89LOH0Ezkfb9Y5Xv/aUv9xY8qMZZh5y1z4u7j/HW8lYPsDwPwAAAABJRU5ErkJggg=="
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var C = __webpack_require__(1);
+	var I = __webpack_require__(4);
+
+	var TreeSapling = (function () {
+		function TreeSapling(map, pos) {
+			_classCallCheck(this, TreeSapling);
+
+			this.type = 'treesapling';
+			this.map = map;
+			this.pos = pos;
+			this.image = I.TREE_UNPLANTED;
+			this.state = 'unplanted';
+			this.activeVillager = null;
+
+			this.growthTimer = 0;
+		}
+
+		_createClass(TreeSapling, [{
+			key: 'plant',
+			value: function plant() {
+				this.state = 'growing';
+				this.growthTimer = C.TREE_GROWTH_TIME;
+				this.activeVillager = null;
+			}
+		}, {
+			key: 'update',
+			value: function update(delta) {
+				if (this.state !== 'growing') {
+					return;
+				}
+
+				if (this.growthTimer > 0) {
+					this.growthTimer -= delta;
+				} else {
+					this.map.data[this.tile.x][this.tile.y] = 'tree';
+					this.map.entities.splice(this.map.entities.indexOf(this), 1);
+					return;
+				}
+
+				if (this.growthTimer < C.TREE_GROWTH_TIME * .7) {
+					this.image = I.TREE_GROWING;
+				}
+			}
+		}, {
+			key: 'tile',
+			get: function get() {
+				return { x: Math.floor(this.pos.x / this.map.tileWidth), y: Math.floor(this.pos.y / this.map.tileHeight) };
+			}
+		}]);
+
+		return TreeSapling;
+	})();
+
+	module.exports = TreeSapling;
+
+/***/ },
+/* 22 */
+/***/ function(module, exports) {
+
+	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAACxQAAAsUBidZ/7wAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAADRSURBVBiVhc6xbkFRHIDx73/uyY1wbyx2SxMDHYz1JIyeoYPFE1CLB2Cy9Bm6NjFIJxIxkUiaNDEo4rqccywkCPHNv+ETThUDyhmfqhYKgDs4houYzs+aTwABeEvTyCZ49wTFRcZhpxEf/SU1KQaUcyl6t+gSTzZUvNeAVqh5uYcAlCBAqHxF/hE6p4WCcuCeQQSn9pbRM3ewDNUipmMc9hEyDvMX0/V+Y0aBJpnWlE7jV2gW0RysaHsA8x1fvjAGwp0lsbX8rw3fs4j6YEUb4Ah4jklEZ/4ZowAAAABJRU5ErkJggg=="
+
+/***/ },
+/* 23 */
+/***/ function(module, exports) {
+
+	module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAADOQAAAzkB9DppvwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAGcSURBVCiRldI9S1tRGAfw/znn3nty83ZzY0xULGoiYgLFCi4dbDvqKI7ZXRz8Di3SD1BwcBA3P4FDhyIi7SJZRNoiNJWS2JDmPdfc3NfToQ3YUEL8T8/w//E8w0MwlNSSlp5cVo4ISKlVMj8oIRYWIOHiRfPtw540GGafRfPhlJyLpvhWdIZnASCVC+UBwHeFLzxhfP/UejfoMwCIzQVXsxvxU/2J+pJHpMnhKwglJBhXnkeScpopUtX4ZZUpACTm+aasMmkYPEwgwmLTTyM7Uzl1HwDo7Kq2nVwO7Y1C/26HCgAs8yJ2os0EMuNCyqguXO8jSyyEVsJJZW1cKHHKfQ+L1DHdu3HRINa9X6Bck1Yeg4yqXf/52X5De037yun51rjQtX2nU+o0WOO2fy5c0dbn1U1CyUgkfIFG0byqfTOPKAD8KHQOOmXr6yhkdV3j5qyx++V9fR34+zkABNd417l3a2bb6wV1eY6QPxs8W4BKBJVr47B40XoNQADA/26jS6/0fTUur7dK5nH7tn+pTAQWnEr3rNlEe1D6Dd/ukgxRbSD2AAAAAElFTkSuQmCC"
 
 /***/ }
 /******/ ]);

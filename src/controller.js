@@ -23,6 +23,10 @@ class Controller{
 						this.placingFarm = false
 						this.map.placeFarm({x: this.mousePos.x + view.offset.x, y: this.mousePos.y + view.offset.y})
 					}
+					if(this.placingTree){
+						this.placingTree = false
+						this.map.placeTree({x: this.mousePos.x + view.offset.x, y: this.mousePos.y + view.offset.y})
+					}
 					break
 				case 2:
 					this.draggingView = true
@@ -82,10 +86,17 @@ class Controller{
 				case 70:
 					this.placingFarm = true
 					this.placingHouse = false
+					this.placingTree = false
 					break
 				case 72:
 					this.placingHouse = true
 					this.placingFarm = false
+					this.placingTree = false
+					break
+				case 84:
+					this.placingTree = true
+					this.placingFarm = false
+					this.placingHouse = false
 					break
 				case 27:
 					this.placingFarm = false
