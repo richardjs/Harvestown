@@ -81,7 +81,7 @@ class Map{
 	deleteEntity(pos){
 		pos = this.tileToPixel(this.pixelToTile(pos))
 		var entity = this.entityAtPixel(pos)
-		if(entity && entity !== 'villager' && entity !== 'treesapling'){
+		if(entity && entity.type !== 'villager' && entity.type !== 'treesapling'){
 			if(entity.activeVillager){
 				entity.activeVillager.activeFarm = null
 				entity.activeVillager.activeHouse = null

@@ -140,7 +140,7 @@
 
 	// Villager parameters
 	exports.VILLAGER_SPEED = 20;
-	exports.VILLAGER_WANDER_RANGE = 10;
+	exports.VILLAGER_WANDER_RANGE = 7;
 	exports.VILLAGER_HUNGER_TIME = 60 * 1000;
 	exports.VILLAGER_WORK_TIME = 1000;
 
@@ -289,7 +289,7 @@
 			value: function deleteEntity(pos) {
 				pos = this.tileToPixel(this.pixelToTile(pos));
 				var entity = this.entityAtPixel(pos);
-				if (entity && entity !== 'villager' && entity !== 'treesapling') {
+				if (entity && entity.type !== 'villager' && entity.type !== 'treesapling') {
 					if (entity.activeVillager) {
 						entity.activeVillager.activeFarm = null;
 						entity.activeVillager.activeHouse = null;

@@ -10,7 +10,7 @@ exports.TILE_HEIGHT = 20
 
 // Villager parameters
 exports.VILLAGER_SPEED = 20
-exports.VILLAGER_WANDER_RANGE = 10
+exports.VILLAGER_WANDER_RANGE = 7
 exports.VILLAGER_HUNGER_TIME = 60*1000
 exports.VILLAGER_WORK_TIME = 1000
 
