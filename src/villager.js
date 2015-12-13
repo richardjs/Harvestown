@@ -388,9 +388,12 @@ class Villager{
 					}
 				}
 				if(closestHouse){
-					this.activeHouse = closestHouse
-					this.activeHouse.activeVillager = this
-					return
+					this.goToTile(closestHouse.tile)
+					if(this.pixelTarget !== null){
+						this.activeHouse = closestHouse
+						this.activeHouse.activeVillager = this
+						return
+					}
 				}
 			}
 		}
@@ -448,8 +451,8 @@ class Villager{
 			closestFarm.activeVillager = this
 			this.activeFarm = closestFarm
 			this.goToTile(closestFarm.tile)
-			this.pauseTimer = C.VILLAGER_WORK_TIME
-			if(this.path.pixelTarget !== null){
+			if(this.pixelTarget !== null){
+				this.pauseTimer = C.VILLAGER_WORK_TIME
 				return
 			}else{
 				this.activeFarm.activeVillager = null
