@@ -149,7 +149,7 @@ class Villager{
 		// Past here, we've stopped walking, and thus need to make a decision about what to do
 		
 		// If we're hungry, go home, or eat if we are home
-		if(this.hungry && !this.carryingLumber && !this.carryingFood && this.pauseTimer <= 0){
+		if(this.hungry && !this.carryingLumber && !this.carryingFood){
 			// Abandon projects so someone else can work on them
 			if(this.activeHouse){
 				this.activeHouse.activeVillager = null
