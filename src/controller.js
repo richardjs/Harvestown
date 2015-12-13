@@ -106,6 +106,7 @@ class Controller{
 					this.deleting = false
 					break
 				case 68:
+				case 88:
 					this.deleting = true
 					this.placingFarm = false
 					this.placingHouse = false

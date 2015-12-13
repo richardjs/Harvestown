@@ -1586,6 +1586,7 @@
 					_this.deleting = false;
 					break;
 				case 68:
+				case 88:
 					_this.deleting = true;
 					_this.placingFarm = false;
 					_this.placingHouse = false;
