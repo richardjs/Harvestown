@@ -4,6 +4,8 @@ exports.VILLAGER = new Image()
 exports.VILLAGER.src = require('../img/villager.png')
 exports.VILLAGER_LUMBER = new Image()
 exports.VILLAGER_LUMBER.src = require('../img/villager_lumber.png')
+exports.VILLAGER_FOOD = new Image()
+exports.VILLAGER_FOOD.src = require('../img/villager_food.png')
 
 exports.HOUSE = new Image()
 exports.HOUSE.src = require('../img/house.png')

@@ -105,6 +105,8 @@ class Villager{
 	update(delta){
 		if(this.carryingLumber){
 			this.image = I.VILLAGER_LUMBER
+		}else if(this.carryingFood){
+			this.image = I.VILLAGER_FOOD
 		}else{
 			this.image = I.VILLAGER
 		}
