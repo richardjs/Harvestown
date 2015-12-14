@@ -65,6 +65,8 @@
 	global.map = new Map(C.MAP_WIDTH, C.MAP_HEIGHT, C.TILE_WIDTH, C.TILE_HEIGHT);
 	global.view = new View(canvas, ctx, map);
 	global.controller = new Controller(map);
+	global.helpBox = document.getElementById('instructions');
+	global.helpOn = true;
 
 	var musicVolume = localStorage.getItem('ld34_music_volume') || .25;
 	global.music = new Howl({
@@ -1523,6 +1525,9 @@
 					_this.draggingView = true;
 					_this.mousePos.x = e.clientX;
 					_this.mousePos.y = e.clientY;
+					_this.placingFarm = false;
+					_this.placingHouse = false;
+					_this.placingTree = false;
 					break;
 			}
 		});
@@ -1604,6 +1609,10 @@
 					_this.placingHouse = false;
 					_this.placingTree = false;
 					_this.deleting = false;
+					if (helpOn) {
+						helpBox.style.display = 'none';
+						helpOn = false;
+					}
 					break;
 
 				case 173:
@@ -1623,6 +1632,16 @@
 						music.paused = true;
 					}
 					break;
+
+				case 191:
+					e.preventDefault();
+					if (helpOn) {
+						helpBox.style.display = 'none';
+						helpOn = false;
+					} else {
+						helpBox.style.display = 'block';
+						helpOn = true;
+					}
 			}
 		});
 	};

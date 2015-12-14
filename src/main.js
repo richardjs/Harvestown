@@ -19,7 +19,8 @@ window.addEventListener('resize', e => {
 global.map = new Map(C.MAP_WIDTH, C.MAP_HEIGHT, C.TILE_WIDTH, C.TILE_HEIGHT)
 global.view = new View(canvas, ctx, map)
 global.controller = new Controller(map)
-
+global.helpBox = document.getElementById('instructions')
+global.helpOn = true
 
 var musicVolume = localStorage.getItem('ld34_music_volume') || .25
 global.music = new Howl({

@@ -36,6 +36,9 @@ class Controller{
 					this.draggingView = true
 					this.mousePos.x = e.clientX
 					this.mousePos.y = e.clientY
+					this.placingFarm = false
+					this.placingHouse = false
+					this.placingTree = false
 					break
 			}
 		})
@@ -117,6 +120,10 @@ class Controller{
 					this.placingHouse = false
 					this.placingTree = false
 					this.deleting = false
+					if(helpOn){
+						helpBox.style.display = 'none'
+						helpOn = false
+					}
 					break
 
 				case 173:
@@ -136,6 +143,16 @@ class Controller{
 						music.paused = true
 					}
 					break
+
+				case 191:
+					e.preventDefault()
+					if(helpOn){
+						helpBox.style.display = 'none'
+						helpOn = false
+					}else{
+						helpBox.style.display = 'block'
+						helpOn = true
+					}
 			}
 		})
 	}
