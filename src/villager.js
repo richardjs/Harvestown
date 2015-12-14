@@ -69,7 +69,13 @@ class Villager{
 			this.pixelTarget = null
 			return
 		}
-		this.setMapTarget(this.path.shift())
+		var nextNode = this.path.shift()
+		if(map.at(nextNode) !== undefined){
+			this.path = []
+			this.pixelTarget = null
+			return
+		}
+		this.setMapTarget(nextNode)
 	}
 
 	wander(center){
