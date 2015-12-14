@@ -106,6 +106,10 @@ class Villager{
 	}
 
 	update(delta){
+		if(this.map.at(this.tile) === 'tree'){
+			this.map.data[this.tile.x][this.tile.y] = undefined
+		}
+
 		if(this.carryingLumber){
 			this.image = I.VILLAGER_LUMBER
 		}else if(this.carryingFood){
