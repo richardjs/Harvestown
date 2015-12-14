@@ -123,6 +123,7 @@ class Controller{
 					if(helpOn){
 						helpBox.style.display = 'none'
 						helpOn = false
+						resizeCanvas()
 					}
 					break
 
@@ -149,9 +150,11 @@ class Controller{
 					if(helpOn){
 						helpBox.style.display = 'none'
 						helpOn = false
+						resizeCanvas()
 					}else{
 						helpBox.style.display = 'block'
 						helpOn = true
+						resizeCanvas()
 					}
 			}
 		})

@@ -54,13 +54,22 @@
 	var canvas = document.createElement('canvas');
 	var ctx = canvas.getContext('2d');
 
+	function properHeight() {
+		// Thanks http://stackoverflow.com/questions/1145850/how-to-get-height-of-entire-document-with-javascript
+		if (helpOn) {
+			return Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight, window.innerHeight);
+		} else {
+			return window.innerHeight;
+		}
+	}
+
 	document.body.appendChild(canvas);
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerHeight;
-	window.addEventListener('resize', function (e) {
+	global.resizeCanvas = function () {
 		canvas.width = window.innerWidth;
-		canvas.height = window.innerHeight;
-	});
+		canvas.height = properHeight();
+	};
+	window.addEventListener('resize', resizeCanvas);
+	window.addEventListener('load', resizeCanvas);
 
 	global.map = new Map(C.MAP_WIDTH, C.MAP_HEIGHT, C.TILE_WIDTH, C.TILE_HEIGHT);
 	global.view = new View(canvas, ctx, map);
@@ -1612,6 +1621,7 @@
 					if (helpOn) {
 						helpBox.style.display = 'none';
 						helpOn = false;
+						resizeCanvas();
 					}
 					break;
 
@@ -1638,9 +1648,11 @@
 					if (helpOn) {
 						helpBox.style.display = 'none';
 						helpOn = false;
+						resizeCanvas();
 					} else {
 						helpBox.style.display = 'block';
 						helpOn = true;
+						resizeCanvas();
 					}
 			}
 		});
