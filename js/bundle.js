@@ -615,6 +615,9 @@
 					x: Math.round(this.map.pixelToTile(center).x + (Math.random() * 2 * wanderRange - wanderRange)),
 					y: Math.round(this.map.pixelToTile(center).y + (Math.random() * 2 * wanderRange - wanderRange))
 				});
+				if (this.pixelTarget === null) {
+					this.pauseTimer = C.VILLAGER_WORK_TIME;
+				}
 			}
 		}, {
 			key: 'findDepot',
