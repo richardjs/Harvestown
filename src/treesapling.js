@@ -21,6 +21,7 @@ class TreeSapling{
 
 	plant(){
 		this.state = 'growing'
+		this.image = I.TREE_PLANTED
 		this.growthTimer = C.TREE_GROWTH_TIME
 		this.activeVillager = null
 	}
@@ -38,7 +39,7 @@ class TreeSapling{
 			return
 		}
 
-		if(this.growthTimer < C.TREE_GROWTH_TIME*.7){
+		if(this.growthTimer < C.TREE_GROWTH_TIME*.5){
 			this.image = I.TREE_GROWING
 		}
 	}

@@ -33,6 +33,8 @@ exports.TREE_BROWN = new Image()
 exports.TREE_BROWN.src = require('../img/tree_brown.png')
 exports.TREE_UNPLANTED = new Image()
 exports.TREE_UNPLANTED.src = require('../img/tree_unplanted.png')
+exports.TREE_PLANTED = new Image()
+exports.TREE_PLANTED.src = require('../img/tree_planted.png')
 exports.TREE_GROWING = new Image()
 exports.TREE_GROWING.src = require('../img/tree_growing.png')
 
